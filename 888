@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎄 圣诞村 V27 🎅</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@400;700&display=swap');
+
+        :root {
+            --bg-gradient: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+            --xmas-red: #D62828;
+            --xmas-gold: #FFD700;
+            --panel-bg: rgba(0, 0, 0, 0.35);
+            --glass: blur(12px);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; height: 100vh; background: var(--bg-gradient);
+            font-family: 'Fredoka One', 'Noto Sans SC', sans-serif; color: #fff;
+            overflow: hidden; display: flex; flex-direction: column; user-select: none;
+        }
+
+        /* --- 1. 顶部导航 (通用) --- */
+        .top-bar {
+            height: 60px; width: 100%; background: rgba(0,0,0,0.2); backdrop-filter: var(--glass);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 100; flex-shrink: 0;
+        }
+        .app-title { font-size: 24px; color: var(--xmas-gold); text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .status-group { display: flex; gap: 15px; align-items: center; }
+        .coin-badge { background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--xmas-gold); color: var(--xmas-gold); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .shop-btn { background: var(--xmas-red); padding: 5px 15px; border-radius: 20px; cursor: pointer; border: 1px solid #fff; display: flex; align-items: center; gap: 5px; font-size: 14px; }
+        .profile-badge { display: flex; align-items: center; gap: 10px; cursor: pointer; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; }
+
+        /* --- 2. 核心布局 (关键修改) --- */
+        .app-container {
+            flex: 1; width: 100%; max-width: 1400px; margin: 0 auto;
+            display: grid; 
+            /* 默认桌面端：三列布局 */
+            grid-template-columns: 280px 1fr 320px; 
+            gap: 20px; padding: 20px; overflow: hidden; position: relative;
+        }
+
+        .panel {
+            background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 15px; display: flex; flex-direction: column;
+            backdrop-filter: var(--glass); overflow: hidden; height: 100%;
+        }
+        .center-stage {
+            position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+        }
+
+        /* 手机底部导航 (默认隐藏) */
+        .mobile-nav { display: none; }
+
+        /* --- 3. 响应式适配 (手机端) --- */
+        @media (max-width: 768px) {
+            .app-title { font-size: 18px; }
+            .app-container {
+                display: block; /* 取消Grid，改为单页显示 */
+                padding: 0; margin: 0;
+                position: absolute; top: 60px; bottom: 60px; width: 100%;
+            }
+
+            /* 默认隐藏所有板块 */
+            #view-rank, #view-tree, #view-chat {
+                display: none !important; 
+                width: 100%; height: 100%;
+                border-radius: 0; border: none;
+                background: transparent; /* 手机端去掉面板背景，直接透出大背景 */
+            }
+
+            /* 激活的板块显示 */
+            .active-view { display: flex !important; }
+
+            /* 底部导航栏出现 */
+            .mobile-nav {
+                display: flex; height: 60px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+                position: fixed; bottom: 0; width: 100%; z-index: 200;
+                justify-content: space-around; align-items: center; border-top: 1px solid #333;
+            }
+            .nav-item { text-align: center; color: #888; font-size: 10px; width: 33%; cursor: pointer; }
+            .nav-item.active { color: var(--xmas-gold); font-weight: bold; }
+            .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+            /* 适配调整 */
+            .tree-wrapper { transform: scale(0.85); transform-origin: bottom center; margin-bottom: 0; }
+            .profile-badge span { display: none; } /* 手机上隐藏名字，只留头像 */
+            .shop-btn span { display: none; } /* 手机隐藏文字 */
+        }
+
+        /* --- 4. 组件样式 (复用 V22) --- */
+        .panel-title { text-align: center; color: var(--xmas-gold); font-size: 16px; margin-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 8px; flex-shrink: 0; }
+        
+        /* 树 */
+        .tree-header { background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; margin-top: 10px; display: flex; gap: 15px; align-items: center; z-index: 50; border: 1px solid rgba(255,255,255,0.2); }
+        .tree-name { font-size: 24px; color: var(--xmas-gold); }
+        .nav-btn { position: absolute; top: 50%; font-size: 30px; cursor: pointer; color: rgba(255,255,255,0.6); z-index: 60; background: rgba(0,0,0,0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .prev { left: 10px; } .next { right: 10px; }
+        
+        .tree-wrapper { position: relative; width: 400px; height: 580px; margin-top: auto; margin-bottom: 20px; }
+        .tree-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease; pointer-events: none; display: flex; justify-content: center; align-items: flex-end; }
+        .tree-slide.active { opacity: 1; pointer-events: all; z-index: 10; }
+        
+        .tree-css { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+        .star-top { position: absolute; top: 10px; font-size: 60px; z-index: 50; text-shadow: 0 0 20px gold; animation: starPulse 2s infinite; }
+        .tree-layer { width: 0; height: 0; border-left: solid transparent; border-right: solid transparent; border-bottom: solid; position: absolute; border-radius: 20px; }
+        .l1{border-width:0 60px 80px 60px;top:60px;z-index:12}.l2{border-width:0 80px 90px 80px;top:100px;z-index:11}.l3{border-width:0 100px 100px 100px;top:150px;z-index:10}.l4{border-width:0 120px 115px 120px;top:200px;z-index:9}.l5{border-width:0 140px 125px 140px;top:250px;z-index:8}.l6{border-width:0 160px 135px 160px;top:300px;z-index:7}.l7{border-width:0 180px 145px 180px;top:350px;z-index:6}.l8{border-width:0 200px 155px 200px;top:400px;z-index:5}.l9{border-width:0 220px 165px 220px;top:450px;z-index:4}.l10{border-width:0 240px 175px 240px;top:500px;z-index:3}
+        .tree-stump { position: absolute; bottom: -20px; width: 70px; height: 60px; background: #3E2723; z-index: 1; border-radius: 5px; }
+        .t-classic .tree-layer { border-bottom-color: #1B5E20; } .t-classic .l1{border-bottom-color:#2E7D32}
+        .t-ice .tree-layer { border-bottom-color: #0288D1; } .t-ice .l1{border-bottom-color:#4FC3F7}
+        .t-magic .tree-layer { border-bottom-color: #4A148C; } .t-magic .l1{border-bottom-color:#AB47BC}
+
+        .box-wrapper { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 20; }
+        .box { width: 55px; height: 55px; position: absolute; cursor: pointer; background: radial-gradient(circle, #ff5252, #b71c1c); border-radius: 8px; box-shadow: 0 5px 10px rgba(0,0,0,0.5); transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+        .box::before { content:''; position: absolute; background: gold; width: 8px; height: 100%; } .box::after { height: 8px; width: 100%; }
+        .bow { position: absolute; top: -5px; width: 18px; height: 10px; background: gold; border-radius: 50%; z-index: 2; }
+        .box:hover { transform: scale(1.2) rotate(5deg); z-index: 30; box-shadow: 0 0 20px gold; }
+        .box.opened { background: #333; box-shadow: inset 0 0 10px #000; border: 1px solid #555; cursor: default; transform: scale(1); opacity: 0.8; }
+        .box.opened::before, .box.opened::after, .box.opened .bow { display: none; }
+        .box.disabled:not(.opened) { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
+        .pos0{top:170px;left:220px}.pos1{top:250px;left:180px;transform:rotate(-10deg)}.pos2{top:270px;left:280px;transform:rotate(10deg)}.pos3{top:340px;left:140px}.pos4{top:350px;left:320px;transform:rotate(-5deg)}.pos5{top:370px;left:230px;transform:rotate(8deg)}.pos6{top:440px;left:100px;transform:rotate(15deg)}.pos7{top:450px;left:360px;transform:rotate(-12deg)}.pos8{top:480px;left:200px}
+
+        /* 列表与聊天 */
+        .scroll-list { flex: 1; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; min-height: 0; }
+        .chat-row { display: flex; gap: 8px; margin-bottom: 8px; animation: fadeIn 0.3s; }
+        .chat-av { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--xmas-gold); flex-shrink: 0; background-size: cover; cursor: pointer; }
+        .chat-content { display: flex; flex-direction: column; max-width: 85%; }
+        .chat-name { font-size: 11px; color: #ccc; margin-bottom: 2px; }
+        .chat-bubble { background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 0 10px 10px 10px; font-size: 13px; line-height: 1.4; word-break: break-word; }
+        .chat-row.bot .chat-bubble { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.4); }
+        .chat-row.bot .chat-name { color: #69f0ae; }
+        .chat-av.bot-av { font-size: 20px; text-align: center; line-height: 30px; background: none; border: none; }
+        .chat-input-row { display: flex; gap: 5px; flex-shrink: 0; margin-top: auto; }
+        .chat-inp { flex: 1; padding: 8px; border-radius: 15px; border: none; outline: none; background: rgba(255,255,255,0.9); }
+        .rank-item { display: flex; align-items: center; padding: 8px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        .rank-av { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #fff; margin-right: 8px; flex-shrink: 0; background-size: cover; }
+        .rank-text { line-height: 1.3; color: #eee; }
+        .rank-action { color: #ff5252; font-weight: bold; margin: 0 3px; }
+
+        /* 弹窗 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-card { background: #FDF5E6; color: #333; padding: 25px; border-radius: 20px; width: 380px; border: 4px solid var(--xmas-red); text-align: center; position: relative; max-height: 85vh; overflow-y: auto; }
+        .btn-main { background: var(--xmas-red); color: white; border: none; padding: 8px 25px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #8B0000; transition: 0.1s; margin-top: 10px; }
+        .btn-main:active { transform: translateY(2px); box-shadow: none; }
+        .btn-close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px; color: #999; }
+        
+        /* 头像/性别/商店 */
+        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; justify-items: center; }
+        .av-select { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .av-select.selected { border-color: var(--xmas-gold); transform: scale(1.1); box-shadow: 0 0 15px var(--xmas-gold); }
+        .av-small { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #fff; background-size: cover; }
+        .gender-row { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .gender-opt { padding: 5px 15px; border: 1px solid #ccc; border-radius: 15px; cursor: pointer; background: #fff; font-size: 14px; }
+        .gender-opt.selected { background: var(--xmas-gold); border-color: #ccad00; font-weight: bold; }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #eee; }
+
+        /* 配色 */
+        .p0{background:linear-gradient(135deg,#ff5252,#b71c1c)} .p1{background:linear-gradient(135deg,#69f0ae,#1b5e20)}
+        .p2{background:linear-gradient(135deg,#ffe082,#ff6f00)} .p3{background:linear-gradient(135deg,#448aff,#1565c0)}
+        .p4{background:linear-gradient(135deg,#e040fb,#7b1fa2)} .p5{background:linear-gradient(135deg,#18ffff,#006064)}
+        .p6{background:linear-gradient(135deg,#ffab40,#e65100)} .p7{background:linear-gradient(135deg,#ff80ab,#c2185b)}
+
+        /* 动画 */
+        @keyframes starPulse { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(5px)} to{opacity:1; transform:translateY(0)} }
+        .snowflake { position: absolute; top: -20px; color: #fff; animation: fall linear infinite; pointer-events: none; opacity: 0.7; }
+        @keyframes fall { to { transform: translateY(110vh); } }
+    </style>
+</head>
+<body>
+
+    <div class="santa-sleigh-flying">🎅🛷</div>
+    <div class="reindeer-wrapper"><span class="reindeer-body">🦌</span></div>
+    
+    <div class="top-bar">
+        <div class="app-title">Festive Village</div>
+        <div class="status-group">
+            <div class="coin-badge" onclick="alert('开盒子或卖礼物可获得金币！')"><span>🪙</span> <span id="ui-coins">0</span></div>
+            <div class="shop-btn" onclick="openShop()"><span>🛒</span> <span>集市</span></div>
+            <div class="profile-badge" onclick="openMyProfile()">
+                <div class="av-small p0" id="top-avatar"></div>
+                <span id="top-name" style="font-size:14px;">未登记</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="panel" id="view-rank">
+            <div class="panel-title">📜 礼物动态榜</div>
+            <div class="scroll-list" id="rank-list"></div>
+        </div>
+
+        <div class="center-stage active-view" id="view-tree">
+            <div class="tree-header">
+                <div class="tree-name" id="tree-name-display">🎄 快乐世俗</div>
+                <div style="font-size:20px; cursor:pointer;" onclick="toggleBGM()">🔊</div>
+            </div>
+            <div class="nav-btn prev" onclick="moveSlide(-1)">❮</div>
+            <div class="nav-btn next" onclick="moveSlide(1)">❯</div>
+            <div class="tree-wrapper" id="track"></div>
+        </div>
+
+        <div class="panel" id="view-chat">
+            <div class="panel-title">💬 广场热聊</div>
+            <div class="scroll-list" id="chat-list"></div>
+            <div class="chat-input-row">
+                <input type="text" class="chat-inp" id="chat-inp" placeholder="@管家 聊聊..." onkeypress="if(event.key==='Enter') sendChat()">
+                <button class="btn-main" style="padding:8px 15px; margin-top:0; font-size:12px;" onclick="sendChat()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-nav">
+        <div class="nav-item" onclick="switchTab('rank')"><span class="nav-icon">📜</span>动态</div>
+        <div class="nav-item active" onclick="switchTab('tree')"><span class="nav-icon">🎄</span>许愿</div>
+        <div class="nav-item" onclick="switchTab('chat')"><span class="nav-icon">💬</span>热聊</div>
+    </div>
+
+    <div class="modal-overlay active" id="modal-reg"><div class="modal-card"><h2 style="color:var(--xmas-red)">🎅 登记入住</h2><div class="avatar-grid"><div class="av-select p0" onclick="selAv(0)"></div><div class="av-select p1" onclick="selAv(1)"></div><div class="av-select p2" onclick="selAv(2)"></div><div class="av-select p3" onclick="selAv(3)"></div><div class="av-select p4" onclick="selAv(4)"></div><div class="av-select p5" onclick="selAv(5)"></div><div class="av-select p6" onclick="selAv(6)"></div><div class="av-select p7" onclick="selAv(7)"></div></div><div class="gender-row"><div class="gender-opt selected" id="g-boy" onclick="selGender('boy')">👦 男生</div><div class="gender-opt" id="g-girl" onclick="selGender('girl')">👧 女生</div></div><input id="inp-name" type="text" placeholder="昵称" style="width:80%;padding:10px;margin-bottom:10px"><input id="inp-bio" type="text" placeholder="入村宣言" style="width:80%;padding:10px;margin-bottom:20px"><button class="btn-main" onclick="register()">开启旅程</button></div></div>
+    
+    <div class="modal-overlay" id="modal-shop"><div class="modal-card"><div class="btn-close" onclick="closeModal('modal-shop')">✕</div><h2 style="color:var(--xmas-red)">🛒 圣诞集市</h2><p>余额: <span style="color:var(--xmas-gold);font-weight:bold;">🪙 <span id="shop-coins">0</span></span></p><hr style="border:0;border-top:1px dashed #ccc;margin:15px 0"><div class="shop-item"><div style="text-align:left"><div style="font-weight:bold">🎟️ 许愿券</div><div style="font-size:12px;color:#666">抽奖机会 +1</div></div><button class="btn-main" style="padding:5px 15px;margin:0;font-size:14px" onclick="buyChance()">100 🪙</button></div></div></div>
+    
+    <div class="modal-overlay" id="modal-prize"><div class="modal-card"><h2 style="color:var(--xmas-gold)">✨ 哇！拆到了 ✨</h2><div id="prize-icon" style="font-size:70px;margin:10px 0"></div><div id="prize-name" style="font-size:20px;font-weight:bold"></div><div style="margin-top:10px;color:#d32f2f;font-weight:bold">+ <span id="prize-add-coins">0</span> 金币 🪙</div><div id="retry-hint" style="color:green;display:none;margin-top:5px">(获得【时光倒流】机会+1)</div><br><button class="btn-main" onclick="closeModal('modal-prize')">收入背包</button></div></div>
+    
+    <div class="modal-overlay" id="modal-prof"><div class="modal-card"><div class="btn-close" onclick="closeModal('modal-prof')">✕</div><div id="prof-av" class="av-small" style="width:60px;height:60px;margin:0 auto 10px auto;border-width:3px"></div><h3 id="prof-name"></h3><p id="prof-gender" style="font-size:14px;margin-top:-10px;margin-bottom:5px"></p><p id="prof-bio" style="font-style:italic;color:#666;background:#eee;padding:5px;border-radius:5px;font-size:13px"></p><hr style="border:0;border-top:1px dashed #ccc;margin:15px 0"><h4 id="prof-bag-title">🎒 背包</h4><div id="prof-bag" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:150px;overflow-y:auto;padding:5px"></div><div id="my-controls" style="display:none;margin-top:15px;border-top:1px solid #ccc;padding-top:10px"><p style="font-size:12px;color:#666">点击礼物操作：</p><p>剩余机会: <span id="my-chances" style="font-weight:bold;color:var(--xmas-red)">0</span></p></div></div></div>
+    
+    <div class="modal-overlay" id="modal-action"><div class="modal-card"><h3>🎁 礼物处理</h3><p>物品：<span id="action-item-name" style="font-weight:bold;color:var(--xmas-red)"></span></p><div style="display:flex;gap:10px;justify-content:center;margin-top:20px"><button class="btn-main" style="background:#4CAF50;margin:0" onclick="openGiveModal()">🎁 送人 (+1机会)</button><button class="btn-main" style="background:#FF9800;margin:0" onclick="sellGift()">💰 卖出 (+<span id="sell-price">0</span>金币)</button></div><button class="btn-main" style="background:#999;margin-top:15px" onclick="closeModal('modal-action')">取消</button></div></div>
+    
+    <div class="modal-overlay" id="modal-give"><div class="modal-card"><h3>🎁 赠送给谁？</h3><div id="give-list" style="text-align:left;max-height:150px;overflow-y:auto;margin:10px 0;background:#fff;border-radius:8px"></div><button class="btn-main" style="background:#666" onclick="closeModal('modal-give')">取消</button></div></div>
+
+    <audio id="sfx-win" src="https://www.soundjay.com/misc/sounds/magic-chime-01.mp3"></audio>
+
+    <script>
+        // 1. 逻辑部分 (保持 V26 逻辑，增加 switchTab)
+        const botNames = ["姜饼仔", "雪人啵啵", "麋鹿车神", "极光", "糖霜猫", "热红酒", "松果", "JingleBell"];
+        const botMsgs = ["今天运气真好！", "求互换礼物~", "谁有多余的金币？", "集齐图鉴太难了", "圣诞快乐！", "好想去滑雪啊"];
+        const trees = [
+            { name: "🎄 快乐世俗", class: "t-classic", gifts: [{i:"💰",n:"暴富"},{i:"🧧",n:"年终奖翻倍"},{i:"🏠",n:"全款买房"},{i:"🚗",n:"喜提新车"},{i:"💳",n:"随便刷"},{i:"📈",n:"基金回本"}] },
+            { name: "❄️ 精神状态", class: "t-ice", gifts: [{i:"😴",n:"深度睡眠"},{i:"🧘",n:"松弛感"},{i:"🏝️",n:"带薪休假"},{i:"❤️",n:"被爱"},{i:"✨",n:"水逆退散"},{i:"🕊️",n:"精神自由"}] },
+            { name: "🔮 魔法打工", class: "t-magic", gifts: [{i:"⏳",n:"时光倒流",type:'retry'},{i:"💇‍♀️",n:"发量惊人"},{i:"🐛",n:"永无Bug"},{i:"🕔",n:"准点下班"},{i:"⚖️",n:"狂吃不胖"},{i:"🐱",n:"猫狗双全"}] }
+        ];
+        const boxPos = [{t:170,l:220}, {t:250,l:180}, {t:270,l:280}, {t:340,l:140}, {t:350,l:320}, {t:370,l:230}, {t:440,l:100}, {t:450,l:360}, {t:480,l:200}];
+
+        let state = JSON.parse(localStorage.getItem('v27_state')) || { opened: {0:[],1:[],2:[]}, history: [], chats: [], users: {} };
+        let me = JSON.parse(localStorage.getItem('v27_me')) || { name:"", bio:"", p:0, gender:"boy", chances:1, coins: 50, inv:[], giftedTo: [] };
+        let curSlide=0, selP=0, selG="boy", actionIdx=-1, slideInterval=null;
+
+        function init() {
+            createSnow(); renderTrees(); renderChat(); renderRank(); updateSlides(); updateUI();
+            setInterval(simBotAction, 12000);
+            // 检测是否已经注册
+            if(me.name) addChat("系统", `${me.name} 回来了。`, 'bot');
+        }
+
+        // --- 手机端切换逻辑 ---
+        window.switchTab = function(tabName) {
+            // 1. 隐藏所有
+            document.getElementById('view-rank').classList.remove('active-view');
+            document.getElementById('view-tree').classList.remove('active-view');
+            document.getElementById('view-chat').classList.remove('active-view');
+            // 2. 显示选中
+            document.getElementById(`view-${tabName}`).classList.add('active-view');
+            // 3. 导航高亮
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // 性能优化
+            if(tabName === 'tree') startAutoSlide(); else stopAutoSlide();
+        }
+
+        function openBox(tIdx, bIdx) {
+            if(!me.name) return;
+            if(state.opened[tIdx].includes(bIdx)) return;
+            if(me.chances <= 0) { alert("机会用光啦！卖礼物或送人可换机会！"); return; }
+            state.opened[tIdx].push(bIdx); me.chances--;
+            const coinGain = Math.floor(Math.random()*40)+10; me.coins+=coinGain;
+            const gift = trees[tIdx].gifts[bIdx%trees[tIdx].gifts.length];
+            if(gift.type==='retry') me.chances++;
+            me.inv.push({i:gift.i, n:gift.n, from:me.name, to:me.name, type:'draw'});
+            state.history.unshift({i:gift.i, n:gift.n, from:me.name, to:me.name, type:'draw', p:me.p});
+            playSound(); saveAll(); renderTrees(); updateSlides(); renderRank(); updateUI();
+            document.getElementById('prize-icon').innerText = gift.i;
+            document.getElementById('prize-name').innerText = gift.n;
+            document.getElementById('prize-add-coins').innerText = coinGain;
+            document.getElementById('retry-hint').style.display = gift.type==='retry'?'block':'none';
+            document.getElementById('modal-prize').classList.add('active');
+        }
+
+        function sendChat() {
+            const inp = document.getElementById('chat-inp'); const txt = inp.value.trim();
+            if(!txt || !me.name) return;
+            addChat(me.name, txt, me.p); inp.value = '';
+            if(txt.includes("@管家")) {
+                let reply = "我在听！卖礼物或送人都能换资源哦！";
+                if(txt.includes("没钱")) reply = "快去开箱子，里面有金币！";
+                setTimeout(() => addChat("驯鹿管家", reply, 'bot'), 1000);
+            }
+        }
+
+        function simBotAction() {
+            const bot = botNames[Math.floor(Math.random()*botNames.length)];
+            const p = Math.floor(Math.random()*8);
+            if(Math.random() < 0.3) addChat(bot, botMsgs[Math.floor(Math.random()*botMsgs.length)], p);
+            else if(Math.random() < 0.6) {
+                state.history.unshift({i:"🎁", n:"神秘礼物", from:bot, to:bot, type:'draw', p:p});
+                if(state.history.length>20) state.history.pop();
+                saveState(); renderRank();
+            }
+        }
+
+        function renderRank() {
+            const list = document.getElementById('rank-list'); list.innerHTML = '';
+            state.history.slice(0,50).forEach(h => {
+                const el = document.createElement('div'); el.className = 'rank-item';
+                const av = `<div class="rank-av p${h.p}" style="width:28px;height:28px;border-radius:50%;border:1px solid #fff;margin-right:8px;flex-shrink:0;background-size:cover;"></div>`;
+                let txt = h.type==='draw' 
+                    ? `<span style="color:#FFD700">${h.from}</span> 拆到了 ${h.i} ${h.n}` 
+                    : `<span style="color:#FFD700">${h.from}</span> <span class="rank-action" style="color:red;margin:0 2px">送给</span> ${h.to}`;
+                el.innerHTML = `${av}<div style="color:#eee">${txt}</div>`;
+                el.onclick = () => showProfile(h.from);
+                list.appendChild(el);
+            });
+        }
+
+        function showProfile(name) {
+            const isMe = (name === me.name);
+            const user = isMe ? me : (state.users[name] || {bio:"神秘村民", p:0, gender:"boy"});
+            document.getElementById('prof-name').innerText = name;
+            document.getElementById('prof-gender').innerText = user.gender === 'boy' ? '👦 男生' : '👧 女生';
+            document.getElementById('prof-bio').innerText = user.bio;
+            document.getElementById('prof-av').className = `av-small p${user.p}`;
+            document.getElementById('prof-bag-title').innerText = isMe ? "🎒 我的背包 (点击操作)" : `🎒 ${user.gender==='boy'?'他':'她'}的背包`;
+            const bag = document.getElementById('prof-bag'); bag.innerHTML = '';
+            let items = isMe ? me.inv : state.history.filter(h => h.to===name && h.type!=='give').map(h=>({i:h.i, n:h.n}));
+            if(items.length === 0) bag.innerHTML = '<div style="color:#aaa; font-size:12px;">空空如也</div>';
+            items.forEach((item, idx) => {
+                const d = document.createElement('div'); d.style.background='rgba(255,255,255,0.1)'; d.style.padding='5px'; d.style.borderRadius='5px'; d.style.fontSize='12px'; d.innerHTML=`${item.i}<br>${item.n}`;
+                if(isMe) { d.style.cursor='pointer'; d.onclick = () => openActionModal(idx); }
+                bag.appendChild(d);
+            });
+            document.getElementById('my-controls').style.display = isMe ? 'block' : 'none';
+            if(isMe) document.getElementById('my-chances').innerText = me.chances;
+            document.getElementById('modal-prof').classList.add('active');
+        }
+
+        function openActionModal(idx) {
+            actionIdx = idx; document.getElementById('action-item-name').innerText = me.inv[idx].n;
+            const price = Math.floor(Math.random()*30)+30; document.getElementById('sell-price').innerText = price; document.getElementById('sell-price').dataset.price = price;
+            closeModal('modal-prof'); document.getElementById('modal-action').classList.add('active');
+        }
+        function sellGift() {
+            me.inv.splice(actionIdx, 1); me.coins += parseInt(document.getElementById('sell-price').dataset.price);
+            saveAll(); updateUI(); closeModal('modal-action'); alert("出售成功！");
+        }
+        function openGiveModal() {
+            closeModal('modal-action'); const list = document.getElementById('give-list'); list.innerHTML = '';
+            const users = new Set([...botNames]); state.chats.forEach(c => {if(c.p!=='bot') users.add(c.n)}); users.delete(me.name);
+            users.forEach(u => {
+                const d = document.createElement('div'); d.style.padding='10px'; d.style.borderBottom='1px solid #eee'; d.style.cursor='pointer'; d.innerText=`👤 ${u}`;
+                d.onclick = () => giveGift(u); list.appendChild(d);
+            });
+            document.getElementById('modal-give').classList.add('active');
+        }
+        function giveGift(toUser) {
+            if(me.giftedTo.includes(toUser)) { alert("每人只能送一次哦"); return; }
+            const gift = me.inv.splice(actionIdx, 1)[0];
+            state.history.unshift({i:gift.i, n:gift.n, from:me.name, to:toUser, type:'give', p:me.p});
+            me.giftedTo.push(toUser); me.chances++;
+            addChat("村长", `🎁 ${me.name} 把 [${gift.n}] 送给了 ${toUser}！`, 'chief');
+            saveAll(); renderRank(); closeModal('modal-give'); renderTrees(); updateUI(); playSound(); alert("赠送成功！机会+1");
+        }
+
+        function openShop() { document.getElementById('shop-coins').innerText = me.coins; document.getElementById('modal-shop').classList.add('active'); }
+        function buyChance() { if(me.coins >= 100) { me.coins -= 100; me.chances++; saveAll(); updateUI(); renderTrees(); document.getElementById('shop-coins').innerText = me.coins; playSound(); alert("购买成功！"); } else alert("金币不足！"); }
+        
+        function saveAll() { localStorage.setItem('v27_state', JSON.stringify(state)); localStorage.setItem('v27_me', JSON.stringify(me)); }
+        function saveState() { localStorage.setItem('v27_state', JSON.stringify(state)); }
+        function addChat(n, t, p) { state.chats.push({n,t,p}); if(state.chats.length>50) state.chats.shift(); saveAll(); renderChat(); }
+        function renderChat() {
+            const list = document.getElementById('chat-list'); list.innerHTML = '';
+            state.chats.slice(-50).forEach(c => {
+                const row = document.createElement('div'); row.className = c.p==='bot'||c.p==='chief'?'chat-row bot':'chat-row';
+                const avHtml = (c.p==='bot'||c.p==='chief') ? `<div class="chat-av bot-av">${c.p==='chief'?'🎅':'🦌'}</div>` : `<div class="chat-av p${c.p}" onclick="showProfile('${c.n}')"></div>`;
+                row.innerHTML = `${avHtml}<div class="chat-content"><div class="chat-name">${c.n}</div><div class="chat-bubble">${c.t}</div></div>`;
+                list.appendChild(row);
+            });
+            list.scrollTop = list.scrollHeight;
+        }
+        function renderTrees() {
+            const track = document.getElementById('track'); track.innerHTML = '';
+            trees.forEach((tree, tIdx) => {
+                const slide = document.createElement('div'); slide.className = 'tree-slide'; if(tIdx===curSlide) slide.classList.add('active');
+                let layers=''; for(let i=1; i<=10; i++) layers+=`<div class="tree-layer l${i}"></div>`;
+                let boxes='<div class="box-wrapper">';
+                for(let i=0; i<9; i++) {
+                    const isOpen = state.opened[tIdx].includes(i);
+                    const cls = isOpen ? 'opened' : (me.chances<=0?'disabled':'');
+                    boxes += `<div class="box ${cls}" style="top:${boxPos[i].t}px;left:${boxPos[i].l}px" onclick="openBox(${tIdx},${i})"><div class="bow"></div></div>`;
+                }
+                slide.innerHTML = `<div class="tree-css ${tree.class}"><div class="star-top">🌟</div>${layers}<div class="tree-stump"></div>${boxes}</div></div>`;
+                track.appendChild(slide);
+            });
+        }
+        function register() {
+            const n = document.getElementById('inp-name').value.trim(); if(!n) return;
+            me.name=n; me.bio=document.getElementById('inp-bio').value||"暂无"; me.p=selP; me.gender=selG;
+            state.users[me.name]={bio:me.bio, p:me.p, gender:me.gender};
+            saveAll(); document.getElementById('modal-reg').classList.remove('active'); updateUI();
+            addChat("驯鹿管家", `欢迎新村民 ${me.name}！有问题随时 @管家 问我。`, 'bot');
+        }
+        function updateUI() { if(me.name) { document.getElementById('top-name').innerText=me.name; document.getElementById('top-avatar').className=`av-small p${me.p}`; document.getElementById('ui-coins').innerText=me.coins; } }
+        function playSound() { document.getElementById('sfx-win').play().catch(()=>{}); }
+        function toggleBGM() { playSound(); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function moveSlide(d) { curSlide+=d; if(curSlide<0)curSlide=2; if(curSlide>2)curSlide=0; updateSlides(); }
+        function updateSlides() { document.getElementById('tree-name-display').innerText = trees[curSlide].name; document.getElementById('tree-name-display').style.color=trees[curSlide].color; document.querySelectorAll('.tree-slide').forEach((s,i)=>i===curSlide?s.classList.add('active'):s.classList.remove('active')); }
+        function startAutoSlide() { if(slideInterval) clearInterval(slideInterval); slideInterval = setInterval(()=>moveSlide(1), 4000); }
+        function stopAutoSlide() { clearInterval(slideInterval); }
+        function selAv(i) { selP = i; document.querySelectorAll('.av-select').forEach((e,x) => e.style.border = x===i ? '3px solid gold' : '3px solid transparent'); }
+        function selGender(g) { selG = g; document.getElementById('g-boy').className = g==='boy'?'gender-opt selected':'gender-opt'; document.getElementById('g-girl').className = g==='girl'?'gender-opt selected':'gender-opt'; }
+        function openMyProfile() { showProfile(me.name); }
+        function createSnow() { for(let i=0; i<80; i++) { const s=document.createElement('div'); s.className='snowflake'; s.innerText=Math.random()>0.5?'❄':'·'; s.style.left=Math.random()*100+'vw'; s.style.fontSize=(Math.random()*15+5)+'px'; s.style.animationDuration=(Math.random()*5+5)+'s'; s.style.animationDelay=Math.random()*15+'s'; document.body.appendChild(s); }}
+
+        init();
+    </script>
+</body>
+</html>
