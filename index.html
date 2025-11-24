@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎄 Festive Village Live 🎅</title>
+    <style>
+        /* --- 0. 全局设置 --- */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@400;700&display=swap');
+
+        :root {
+            /* 经典的梦幻日落背景 */
+            --bg-gradient: linear-gradient(to bottom, #2b1055, #7597de 50%, #d99c79 80%, #203a43);
+            --xmas-red: #D62828;
+            --xmas-gold: #FCBF49;
+            --panel-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0; height: 100vh; background: var(--bg-gradient);
+            font-family: 'Fredoka One', 'Noto Sans SC', sans-serif; color: #fff;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- 新增：封面首页样式 --- */
+        .landing-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-gradient);
+            z-index: 999; /* 在最上层 */
+            transition: opacity 1s ease;
+        }
+        .landing-page.hidden {
+            opacity: 0; pointer-events: none;
+        }
+        .landing-title {
+            font-size: 4rem; margin-bottom: 2rem; color: var(--xmas-gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .enter-button {
+            padding: 1rem 2rem; font-size: 1.5rem; border: none; border-radius: 5px;
+            background-color: var(--xmas-red); color: #fff; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .enter-button:hover {
+            background-color: #b51e1e;
+        }
+
+        /* --- 雪花动画 --- */
+        .snowflake {
+            position: fixed; top: -10px;
+            width: 15px; height: 15px; background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="white"><path d="M32 2l6 14h12l-10 8 4 13-10-8-10 8 4-13-10-8h12z"/></svg>');
+            background-size: cover; opacity: 0.8;
+            animation: fall 10s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10px) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* --- 右侧面板样式 --- */
+        .sidebar {
+            position: fixed; right: 2%; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; align-items: flex-end;
+        }
+        .info-panel {
+            display: none; width: 280px; padding: 1rem; margin-bottom: 1rem;
+            background: var(--panel-bg); border-radius: 10px; backdrop-filter: blur(10px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateX(100%); transition: transform 0.5s ease;
+        }
+        .info-panel.active { display: block; transform: translateX(0); }
+        .info-panel h2 { margin-top: 0; color: var(--xmas-gold); }
+        .info-panel p { line-height: 1.6; }
+        .btn {
+            margin: 0.5rem 0; padding: 0.6rem 1.2rem; font-size: 1rem;
+            border: none; border-radius: 20px; cursor: pointer;
+            color: #fff; background: var(--xmas-red);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        .btn:hover { background: #b51e1e; }
+
+        /* --- 特效：呼吸灯下雪按钮 --- */
+        .btn-neon {
+            position: relative; z-index: 1;
+        }
+        .btn-neon::before {
+            content: ""; position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; border-radius: 20px; z-index: -1;
+            background: var(--xmas-red);
+            filter: blur(8px); opacity: 0.7;
+            animation: glow 2s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* --- 视频容器 --- */
+        .video-container {
+            position: relative; width: 800px; height: 450px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .video-container video { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+        .video-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+        .video-container:hover .video-overlay { opacity: 1; }
+        .video-overlay button {
+            padding: 0.8rem 1.5rem; font-size: 1.2rem; border: none;
+            border-radius: 5px; background: var(--xmas-gold); color: #333;
+            cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        .video-overlay button:hover { background: #dba73c; }
+
+        /* --- 音乐按钮 --- */
+        .music-btn {
+            position: fixed; top: 2%; left: 2%; width: 50px; height: 50px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="%23FCBF49"><path d="M16 8v32.91A10.94 10.94 0 1028 48V20h20V8H16z"/></svg>') no-repeat center/contain;
+            cursor: pointer;
+        }
+
+        /* --- 主题切换按钮 --- */
+        .theme-toggle {
+            position: fixed; bottom: 2%; left: 2%; padding: 0.5rem 1rem;
+            background: var(--xmas-gold); color: #333; border: none; border-radius: 5px; cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+
+        /* --- 音乐播放进度条 --- */
+        .progress-container {
+            position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
+            width: 80%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px;
+            cursor: pointer;
+        }
+        .progress-bar {
+            height: 100%; width: 0; background: var(--xmas-gold); border-radius: 3px;
+        }
+
+        /* --- 粘性页脚 --- */
+        footer {
+            position: fixed; bottom: 1%; left: 50%; transform: translateX(-50%);
+            font-size: 0.9rem; color: rgba(255,255,255,0.7);
+        }
+    </style>
+</head>
+<body>
+<div class="landing-page" id="landingPage">
+    <div class="landing-title">🎄 欢迎来到节日村现场 🎅</div>
+    <button class="enter-button" id="enterButton">进入网站</button>
+</div>
+
+<div class="music-btn" id="musicBtn"></div>
+<div class="progress-container" id="progressContainer"><div class="progress-bar" id="progressBar"></div></div>
+<button class="theme-toggle" id="themeToggle">切换主题</button>
+
+<div class="sidebar">
+    <button class="btn" id="btnStory">故事</button>
+    <div class="info-panel" id="panelStory">
+        <h2>节日村的故事</h2>
+        <p>很久很久以前，在一座被雪覆盖的小村庄里，住着快乐的精灵们。他们用爱与善良装饰着每一棵圣诞树，让这个世界充满温暖和光芒。</p>
+    </div>
+
+    <button class="btn" id="btnGames">小游戏</button>
+    <div class="info-panel" id="panelGames">
+        <h2>趣味小游戏</h2>
+        <p>节日村的每个角落都藏着惊喜小游戏：雪人投掷、圣诞拼图、星星连连看…… 快来挑战你的手速和智慧吧！</p>
+    </div>
+
+    <button class="btn" id="btnWish">许愿树</button>
+    <div class="info-panel" id="panelWish">
+        <h2>许愿树</h2>
+        <p>站在闪亮的许愿树前，闭上双眼，许下心中最美好的愿望。愿望会随着雪花一起飘向天空，传递到远方。</p>
+    </div>
+</div>
+
+<div class="video-container">
+    <video id="bgVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" muted loop></video>
+    <div class="video-overlay">
+        <button id="playPauseBtn">播放</button>
+    </div>
+</div>
+
+<footer>© 2023 节日村现场. All rights reserved.</footer>
+
+<!-- 音乐 -->
+<audio id="bgMusic" src="https://www.bensound.com/bensound-music/bensound-christmas.mp3"></audio>
+
+<script>
+    // 获取元素
+    const landingPage = document.getElementById('landingPage');
+    const enterButton = document.getElementById('enterButton');
+    const musicBtn = document.getElementById('musicBtn');
+    const bgMusic = document.getElementById('bgMusic');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const themeToggle = document.getElementById('themeToggle');
+    const btnStory = document.getElementById('btnStory');
+    const btnGames = document.getElementById('btnGames');
+    const btnWish = document.getElementById('btnWish');
+    const panelStory = document.getElementById('panelStory');
+    const panelGames = document.getElementById('panelGames');
+    const panelWish = document.getElementById('panelWish');
+    const video = document.getElementById('bgVideo');
+    const videoOverlay = document.querySelector('.video-overlay');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+
+    // 雪花生成
+    function createSnowflake() {
+        const snow = document.createElement('div');
+        snow.classList.add('snowflake');
+        snow.style.left = Math.random() * 100 + 'vw';
+        snow.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        document.body.appendChild(snow);
+        setTimeout(() => snow.remove(), 10000);
+    }
+    setInterval(createSnowflake, 200);
+
+    // 进入网站
+    enterButton.addEventListener('click', () => {
+        landingPage.classList.add('hidden');
+        bgMusic.play();
+    });
+
+    // 音乐播放
+    musicBtn.addEventListener('click', () => {
+        if (bgMusic.paused) {
+            bgMusic.play();
+        } else {
+            bgMusic.pause();
+        }
+    });
+
+    // 更新音乐进度条
+    bgMusic.addEventListener('timeupdate', () => {
+        const percent = (bgMusic.currentTime / bgMusic.duration) * 100;
+        progressBar.style.width = percent + '%';
+    });
+    progressContainer.addEventListener('click', (e) => {
+        const width = progressContainer.clientWidth;
+        const clickX = e.offsetX;
+        bgMusic.currentTime = (clickX / width) * bgMusic.duration;
+    });
+
+    // 主题切换
+    let isDark = true;
+    themeToggle.addEventListener('click', () => {
+        isDark = !isDark;
+        if (isDark) {
+            document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(to bottom, #2b1055, #7597de 50%, #d99c79 80%, #203a43)');
+            document.documentElement.style.setProperty('--xmas-red', '#D62828');
+            document.documentElement.style.setProperty('--xmas-gold', '#FCBF49');
+        } else {
+            document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(to bottom, #ff9a9e, #fecfef 50%, #fecfef 80%, #ff9a9e)');
+            document.documentElement.style.setProperty('--xmas-red', '#FFC0CB');
+            document.documentElement.style.setProperty('--xmas-gold', '#FFF5BA');
+        }
+    });
+
+    // 侧边栏面板切换
+    function togglePanel(panel) {
+        panelStory.classList.remove('active');
+        panelGames.classList.remove('active');
+        panelWish.classList.remove('active');
+        panel.classList.add('active');
+    }
+    btnStory.addEventListener('click', () => togglePanel(panelStory));
+    btnGames.addEventListener('click', () => togglePanel(panelGames));
+    btnWish.addEventListener('click', () => togglePanel(panelWish));
+
+    // 视频播放/暂停
+    videoOverlay.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+            playPauseBtn.textContent = '暂停';
+        } else {
+            video.pause();
+            playPauseBtn.textContent = '播放';
+        }
+    });
+</script>
+</body>
+</html>
