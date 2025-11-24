@@ -3,315 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎄 Festive Village Live 🎅</title>
+    <title>🎄 圣诞村 V25 (智能互动版) 🎅</title>
     <style>
         /* --- 0. 全局设置 --- */
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+SC:wght@400;700&display=swap');
 
         :root {
-            /* 经典的梦幻日落背景 */
-            --bg-gradient: linear-gradient(to bottom, #2b1055, #7597de 50%, #d99c79 80%, #203a43);
+            --bg-gradient: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
             --xmas-red: #D62828;
-            --xmas-gold: #FCBF49;
-            --panel-bg: rgba(255, 255, 255, 0.15);
+            --xmas-gold: #FFD700;
+            --panel-bg: rgba(0, 0, 0, 0.35);
+            --glass: blur(12px);
         }
+
+        * { box-sizing: border-box; }
 
         body {
             margin: 0; height: 100vh; background: var(--bg-gradient);
             font-family: 'Fredoka One', 'Noto Sans SC', sans-serif; color: #fff;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; display: flex; flex-direction: column; user-select: none;
         }
 
-        /* --- 新增：封面首页样式 --- */
-        .landing-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #312A6C, #8567F5, #E68E6D); /* 仿照图片的渐变 */
-            z-index: 2000; /* 最高层级 */
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        /* --- 1. 顶部导航 --- */
+        .top-bar {
+            height: 60px; width: 100%; background: rgba(0,0,0,0.2); backdrop-filter: var(--glass);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 100; flex-shrink: 0;
         }
+        .app-title { font-size: 24px; color: var(--xmas-gold); text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        .landing-page.hidden {
-            opacity: 0; pointer-events: none; transform: scale(1.1);
+        .status-group { display: flex; gap: 15px; align-items: center; }
+        
+        .coin-badge {
+            background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; 
+            border: 1px solid var(--xmas-gold); color: var(--xmas-gold); cursor: pointer;
+            display: flex; align-items: center; gap: 5px; transition: 0.2s;
         }
+        .coin-badge:hover { transform: scale(1.05); background: rgba(0,0,0,0.8); }
 
-        .landing-title-row {
-            display: flex; align-items: center; gap: 20px; margin-bottom: 50px;
+        .shop-btn {
+            background: var(--xmas-red); padding: 5px 15px; border-radius: 20px; cursor: pointer;
+            border: 1px solid #fff; display: flex; align-items: center; gap: 5px; font-size: 14px;
         }
-        
-        .landing-title {
-            font-size: 60px; text-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-family: 'Fredoka One', cursive; letter-spacing: 2px;
-        }
-        
-        .landing-emoji { font-size: 60px; animation: bounce 2s infinite alternate; }
-        
-        .enter-btn {
-            background: #C6362C; /* 图片里的红 */
-            color: #fff;
-            font-family: 'Noto Sans SC', sans-serif;
-            font-size: 24px; padding: 15px 60px;
-            border-radius: 50px; border: none; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(198, 54, 44, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 2px;
-        }
-        
-        .enter-btn:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(198, 54, 44, 0.6); }
-        .enter-btn:active { transform: scale(0.95); }
+        .shop-btn:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--xmas-red); }
 
-        /* --- 1. 氛围组 --- */
-        .santa-sleigh-flying {
-            position: absolute; top: 5%; right: -20%; font-size: 50px;
-            animation: flyOver 35s linear infinite; opacity: 0.8; z-index: 2;
+        .profile-badge {
+            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; transition: 0.2s;
         }
-        @keyframes flyOver { 0% { right: -20%; transform: rotate(5deg) scale(0.8); } 100% { right: 120%; transform: rotate(-5deg) scale(0.8); } }
-
-        .reindeer-wrapper {
-            position: absolute; bottom: 30px; left: -15%; z-index: 5;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
-            animation: runAcrossScreen 24s linear infinite;
-        }
-        .reindeer-body {
-            font-size: 60px; display: block;
-            animation: gallopBounce 0.4s ease-in-out infinite alternate, faceDirection 24s steps(1) infinite; 
-        }
-        @keyframes runAcrossScreen { 0% { left: -15%; } 49.9% { left: 105%; } 50.1% { left: 105%; } 100% { left: -15%; } }
-        @keyframes faceDirection { 0% { transform: scaleX(-1); } 50% { transform: scaleX(1); } 100% { transform: scaleX(-1); } }
-        @keyframes gallopBounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
-        
-        .snowflake { 
-            position: absolute; top: -20px; color: #fff; 
-            animation: fall linear infinite; pointer-events: none; opacity: 0.8; z-index: 2001; /* 让雪花在封面之上 */
-        }
-        @keyframes fall { to { transform: translateY(110vh); } }
+        .profile-badge:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
 
         /* --- 2. 主布局 --- */
         .app-container {
-            width: 98%; max-width: 1400px; height: 92vh;
-            display: grid; 
-            grid-template-columns: 280px 1fr 300px; 
-            gap: 20px; z-index: 10;
+            flex: 1; width: 100%; max-width: 1400px; margin: 0 auto;
+            display: grid; grid-template-columns: 280px 1fr 320px; 
+            gap: 20px; padding: 20px; overflow: hidden;
         }
 
         .panel {
-            background: var(--panel-bg);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px; padding: 20px;
-            display: flex; flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            height: 100%; box-sizing: border-box; overflow: hidden; min-height: 0;
+            background: var(--panel-bg); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 15px; display: flex; flex-direction: column;
+            backdrop-filter: var(--glass); overflow: hidden;
         }
         .panel-title {
-            text-align: center; color: var(--xmas-gold); font-size: 18px; margin-bottom: 15px;
-            border-bottom: 1px dashed rgba(255,255,255,0.3); padding-bottom: 10px; flex-shrink: 0; 
+            text-align: center; color: var(--xmas-gold); font-size: 16px; margin-bottom: 10px;
+            border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 8px; flex-shrink: 0;
         }
 
         /* --- 3. 中间舞台 --- */
         .center-stage {
-            position: relative; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            position: relative; height: 100%; display: flex; flex-direction: column; align-items: center;
         }
+        .tree-header {
+            background: rgba(0,0,0,0.4); padding: 5px 20px; border-radius: 30px; margin-top: 10px;
+            display: flex; gap: 15px; align-items: center; z-index: 50; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .tree-name { font-size: 24px; color: var(--xmas-gold); }
         
-        .stage-header {
-            position: absolute; top: 15px; z-index: 60;
-            display: flex; align-items: center; gap: 15px; left: 50%; transform: translateX(-50%);
-        }
-
-        .tree-title-display {
-            font-size: 32px; color: var(--xmas-gold);
-            text-shadow: 0 0 10px rgba(0,0,0,0.8); transition: 0.5s;
-            background: rgba(0,0,0,0.4); padding: 5px 25px; border-radius: 50px;
-            border: 1px solid rgba(255,215,0,0.3); white-space: nowrap;
-        }
-
-        .bgm-btn {
-            width: 45px; height: 45px;
-            background: rgba(0,0,0,0.4); color: white; border-radius: 50%; font-size: 20px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            border: 2px solid var(--xmas-gold); transition: 0.2s;
-            animation: bellShake 3s infinite;
-        }
-        .bgm-btn:hover { transform: scale(1.1); background: var(--xmas-red); }
-        .bgm-btn.playing { background: var(--xmas-red); animation: none; box-shadow: 0 0 15px var(--xmas-red); }
-        @keyframes bellShake { 0%,100%{transform:rotate(0)} 10%{transform:rotate(15deg)} 20%{transform:rotate(-15deg)} 30%{transform:rotate(10deg)} 40%{transform:rotate(-10deg)} 50%{transform:rotate(0)} }
-
         .nav-btn {
-            position: absolute; top: 50%; width: 50px; height: 50px;
-            background: rgba(0,0,0,0.4); color: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; cursor: pointer; border: 2px solid rgba(255,255,255,0.3);
-            z-index: 60; transition: 0.2s; user-select: none;
+            position: absolute; top: 50%; font-size: 30px; cursor: pointer; color: rgba(255,255,255,0.6);
+            z-index: 60; transition: 0.2s; user-select: none; background: rgba(0,0,0,0.2);
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
         }
-        .nav-btn:hover { background: var(--xmas-red); border-color: var(--xmas-gold); transform: scale(1.1); }
-        .prev-btn { left: 10px; } .next-btn { right: 10px; }
+        .nav-btn:hover { color: #fff; background: var(--xmas-red); transform: scale(1.1); }
+        .prev { left: 0; } .next { right: 0; }
 
-        .tree-wrapper {
-            position: relative; width: 420px; height: 600px; margin-bottom: 80px; box-sizing: border-box;
+        .tree-wrapper { 
+            position: relative; width: 400px; height: 580px; 
+            margin-top: auto; margin-bottom: 20px;
         }
-
         .tree-slide {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; transition: opacity 0.8s ease; pointer-events: none;
             display: flex; justify-content: center; align-items: flex-end;
-            opacity: 0; transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
-            transform: scale(0.95); pointer-events: none;
         }
-        .tree-slide.active { opacity: 1; transform: scale(1); pointer-events: all; z-index: 10; }
+        .tree-slide.active { opacity: 1; pointer-events: all; z-index: 10; }
 
-        /* --- 4. CSS 树 --- */
-        .tree-css {
-            position: relative; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.6));
-            animation: floatTree 6s ease-in-out infinite;
-        }
-        @keyframes floatTree { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-
-        .star-top {
-            position: absolute; top: 10px; font-size: 70px; z-index: 50;
-            background: linear-gradient(to bottom, #fff, #ffd700);
-            -webkit-background-clip: text; color: transparent;
-            filter: drop-shadow(0 0 20px #ffd700); animation: starPulse 2s infinite alternate;
-        }
-        @keyframes starPulse { from{transform:scale(1);} to{transform:scale(1.2);} }
-
-        .tree-layer {
-            width: 0; height: 0; border-left: solid transparent; border-right: solid transparent; border-bottom: solid; 
-            position: absolute; border-radius: 20px;
-        }
-        .l1 { border-width: 0 65px 85px 65px; top: 60px; z-index: 12; }
-        .l2 { border-width: 0 85px 95px 85px; top: 100px; z-index: 11; }
-        .l3 { border-width: 0 105px 105px 105px; top: 150px; z-index: 10; }
-        .l4 { border-width: 0 125px 115px 125px; top: 200px; z-index: 9; }
-        .l5 { border-width: 0 145px 125px 145px; top: 250px; z-index: 8; }
-        .l6 { border-width: 0 165px 135px 165px; top: 300px; z-index: 7; }
-        .l7 { border-width: 0 185px 145px 185px; top: 350px; z-index: 6; }
-        .l8 { border-width: 0 205px 155px 205px; top: 400px; z-index: 5; }
-        .l9 { border-width: 0 225px 165px 225px; top: 450px; z-index: 4; }
-        .l10 { border-width: 0 245px 175px 245px; top: 500px; z-index: 3; }
+        /* 树 */
+        .tree-css { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); }
+        .star-top { position: absolute; top: 10px; font-size: 60px; z-index: 50; text-shadow: 0 0 20px gold; animation: starPulse 2s infinite; }
+        .tree-layer { width: 0; height: 0; border-left: solid transparent; border-right: solid transparent; border-bottom: solid; position: absolute; border-radius: 20px; }
         
-        .tree-stump { 
-            position: absolute; bottom: -20px; width: 80px; height: 70px; 
-            background: repeating-linear-gradient(90deg, #3E2723 0, #3E2723 10px, #2d1b18 10px, #2d1b18 15px);
-            z-index: 1; border-radius: 5px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-        }
+        .l1{border-width:0 60px 80px 60px;top:60px;z-index:12}.l2{border-width:0 80px 90px 80px;top:100px;z-index:11}.l3{border-width:0 100px 100px 100px;top:150px;z-index:10}.l4{border-width:0 120px 115px 120px;top:200px;z-index:9}.l5{border-width:0 140px 125px 140px;top:250px;z-index:8}.l6{border-width:0 160px 135px 160px;top:300px;z-index:7}.l7{border-width:0 180px 145px 180px;top:350px;z-index:6}.l8{border-width:0 200px 155px 200px;top:400px;z-index:5}.l9{border-width:0 220px 165px 220px;top:450px;z-index:4}.l10{border-width:0 240px 175px 240px;top:500px;z-index:3}
+        .tree-stump { position: absolute; bottom: -20px; width: 70px; height: 60px; background: #3E2723; z-index: 1; border-radius: 5px; }
+        .t-classic .tree-layer { border-bottom-color: #1B5E20; } .t-classic .l1{border-bottom-color:#2E7D32}
+        .t-ice .tree-layer { border-bottom-color: #0288D1; } .t-ice .l1{border-bottom-color:#4FC3F7}
+        .t-magic .tree-layer { border-bottom-color: #4A148C; } .t-magic .l1{border-bottom-color:#AB47BC}
 
-        .t-classic .tree-layer { border-bottom-color: #1B5E20; } .t-classic .l1, .t-classic .l2 { border-bottom-color: #2E7D32; }
-        .t-ice .tree-layer { border-bottom-color: #0288D1; } .t-ice .l1, .t-ice .l2 { border-bottom-color: #B3E5FC; } .t-ice .l4, .t-ice .l5 { border-bottom-color: #4FC3F7; }
-        .t-magic .tree-layer { border-bottom-color: #7B1FA2; } .t-magic .l1, .t-magic .l2 { border-bottom-color: #F8BBD0; } .t-magic .l4, .t-magic .l5 { border-bottom-color: #F48FB1; }
-
-        /* --- 5. 礼物盒 --- */
+        /* 盒子 */
         .box-wrapper { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 20; }
         .box {
-            width: 58px; height: 58px; position: absolute; cursor: pointer;
-            background: radial-gradient(circle at 30% 30%, #ff6b6b, var(--xmas-red));
-            border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.2);
-            transition: all 0.3s; display: flex; justify-content: center; align-items: center;
+            width: 55px; height: 55px; position: absolute; cursor: pointer;
+            background: radial-gradient(circle, #ff5252, #b71c1c);
+            border-radius: 8px; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            transition: 0.3s; display: flex; justify-content: center; align-items: center;
         }
-        .box::before { content:''; position: absolute; width: 12px; height: 100%; background: var(--xmas-gold); }
-        .box::after { content:''; position: absolute; height: 12px; width: 100%; background: var(--xmas-gold); }
-        .bow { position: absolute; top: -5px; width: 20px; height: 12px; background: var(--xmas-gold); border-radius: 50%; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        
-        .box:hover { transform: scale(1.15) rotate(5deg); z-index: 30; box-shadow: 0 0 20px var(--xmas-gold); }
-        
-        .box.opened {
-            background: #444; box-shadow: inset 0 0 10px #000; border: 2px solid #666;
-            cursor: default; pointer-events: none; transform: scale(1); opacity: 0.9;
-        }
+        .box::before { content:''; position: absolute; background: gold; width: 8px; height: 100%; } .box::after { height: 8px; width: 100%; }
+        .bow { position: absolute; top: -5px; width: 18px; height: 10px; background: gold; border-radius: 50%; z-index: 2; }
+        .box:hover { transform: scale(1.2) rotate(5deg); z-index: 30; box-shadow: 0 0 20px gold; }
+        .box.opened { background: #333; box-shadow: inset 0 0 10px #000; border: 1px solid #555; cursor: default; transform: scale(1); opacity: 0.8; }
         .box.opened::before, .box.opened::after, .box.opened .bow { display: none; }
-        .box.disabled:not(.opened) { filter: grayscale(1); opacity: 0.6; cursor: not-allowed; }
+        .box.disabled:not(.opened) { filter: grayscale(1); opacity: 0.5; cursor: not-allowed; }
+        .pos0{top:170px;left:220px}.pos1{top:250px;left:180px;transform:rotate(-10deg)}.pos2{top:270px;left:280px;transform:rotate(10deg)}.pos3{top:340px;left:140px}.pos4{top:350px;left:320px;transform:rotate(-5deg)}.pos5{top:370px;left:230px;transform:rotate(8deg)}.pos6{top:440px;left:100px;transform:rotate(15deg)}.pos7{top:450px;left:360px;transform:rotate(-12deg)}.pos8{top:480px;left:200px}
 
-        .pos0 { top: 170px; left: 220px; } .pos1 { top: 250px; left: 180px; transform: rotate(-10deg); }
-        .pos2 { top: 270px; left: 280px; transform: rotate(10deg); } .pos3 { top: 340px; left: 140px; }
-        .pos4 { top: 350px; left: 320px; transform: rotate(-5deg); } .pos5 { top: 370px; left: 230px; transform: rotate(8deg); }
-        .pos6 { top: 440px; left: 100px; transform: rotate(15deg); } .pos7 { top: 450px; left: 360px; transform: rotate(-12deg); }
-        .pos8 { top: 480px; left: 200px; }
-
-        /* --- 6. 右侧：聊天 --- */
+        /* --- 4. 右侧：聊天 --- */
         .scroll-list { flex: 1; overflow-y: auto; margin-bottom: 10px; padding-right: 5px; min-height: 0; }
-        .scroll-list::-webkit-scrollbar { width: 4px; background: rgba(0,0,0,0.2); }
+        .scroll-list::-webkit-scrollbar { width: 4px; background: rgba(0,0,0,0.3); }
         .scroll-list::-webkit-scrollbar-thumb { background: var(--xmas-gold); border-radius: 2px; }
 
-        .chat-row { display: flex; align-items: flex-start; margin-bottom: 10px; animation: fadeIn 0.3s; }
-        .chat-av { width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; border: 1px solid var(--xmas-gold); cursor: pointer; background-size: cover; background-position: center; }
-        .chat-bubble { background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px; font-size: 13px; flex: 1; word-break: break-word; }
-        .chat-name { color: var(--xmas-gold); font-weight: bold; font-size: 12px; margin-bottom: 2px; cursor: pointer; }
+        .chat-row { display: flex; gap: 8px; margin-bottom: 8px; animation: fadeIn 0.3s; }
+        .chat-av { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--xmas-gold); flex-shrink: 0; background-size: cover; cursor: pointer; }
+        .chat-content { display: flex; flex-direction: column; max-width: 85%; }
+        .chat-name { font-size: 11px; color: #ccc; margin-bottom: 2px; }
+        .chat-bubble { background: rgba(0,0,0,0.6); padding: 6px 10px; border-radius: 0 10px 10px 10px; font-size: 13px; line-height: 1.4; word-break: break-word; }
         
-        .chat-row.chief .chat-name { color: #00e676; } 
-        .chat-row.chief .chat-bubble { background: rgba(255,255,255,0.1); color: #ddd; font-size: 12px; font-style: italic; }
-        .chat-av.chief-av { border: none; background: none; font-size: 28px; line-height: 32px; text-align: center; }
+        .chat-row.bot .chat-bubble { background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.4); }
+        .chat-row.bot .chat-name { color: #69f0ae; }
+        .chat-av.bot-av { font-size: 20px; text-align: center; line-height: 30px; background: none; border: none; }
 
         .chat-input-row { display: flex; gap: 5px; flex-shrink: 0; margin-top: auto; }
-        .chat-inp { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; outline: none; }
-        
-        /* --- 7. 左侧：榜单 --- */
-        .rank-item { display: flex; align-items: center; padding: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.1); border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .rank-item:hover { background: rgba(255,255,255,0.25); }
-        .av-small { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--xmas-gold); margin-right: 8px; flex-shrink: 0; background-size: cover; }
+        .chat-inp { flex: 1; padding: 8px; border-radius: 15px; border: none; outline: none; background: rgba(255,255,255,0.9); }
 
-        /* --- 8. 弹窗 --- */
+        /* --- 5. 左侧：榜单 --- */
+        .rank-item { display: flex; align-items: center; padding: 8px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+        .rank-item:hover { background: rgba(255,255,255,0.2); }
+        .rank-av { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #fff; margin-right: 8px; flex-shrink: 0; background-size: cover; }
+        .rank-text { line-height: 1.3; color: #eee; }
+        .rank-action { color: #ff5252; font-weight: bold; margin: 0 3px; }
+
+        /* --- 6. 弹窗通用 --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-card { background: #F8F2E4; color: #333; padding: 30px; border-radius: 20px; width: 400px; border: 4px solid var(--xmas-red); text-align: center; position: relative; }
-        .btn-main { background: var(--xmas-red); color: white; border: none; padding: 10px 30px; border-radius: 50px; font-size: 16px; cursor: pointer; box-shadow: 0 4px 0 #8a1010; }
-        .btn-main:active { transform: translateY(3px); box-shadow: none; }
-        .my-profile-btn { position: absolute; top: 20px; right: 20px; z-index: 100; background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 10px; border: 1px solid var(--xmas-gold); }
+        .modal-card { background: #FDF5E6; color: #333; padding: 25px; border-radius: 20px; width: 380px; border: 4px solid var(--xmas-red); text-align: center; position: relative; max-height: 85vh; overflow-y: auto; }
+        .btn-main { background: var(--xmas-red); color: white; border: none; padding: 8px 25px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #8B0000; transition: 0.1s; margin-top: 10px; }
+        .btn-main:active { transform: translateY(2px); box-shadow: none; }
+        .btn-close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px; color: #999; }
 
-        .gender-row { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; }
-        .gender-opt { cursor: pointer; padding: 8px 20px; border: 1px solid #ccc; border-radius: 20px; background: #fff; transition: 0.2s; }
-        .gender-opt.selected { background: var(--xmas-gold); border-color: #d4a000; font-weight: bold; }
+        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 15px 0; justify-items: center; }
+        .av-select { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .av-select.selected { border-color: var(--xmas-gold); transform: scale(1.1); box-shadow: 0 0 15px var(--xmas-gold); }
+        .av-small { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #fff; background-size: cover; }
 
-        .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; justify-items: center; }
-        .av-select { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .av-select.selected { border-color: var(--xmas-gold); transform: scale(1.1); }
+        .gender-row { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .gender-opt { padding: 5px 15px; border: 1px solid #ccc; border-radius: 15px; cursor: pointer; background: #fff; font-size: 14px; }
+        .gender-opt.selected { background: var(--xmas-gold); border-color: #ccad00; font-weight: bold; }
 
-        .p0 { background: repeating-linear-gradient(45deg, #b71c1c 0, #b71c1c 10px, #1b5e20 10px, #1b5e20 20px); }
-        .p1 { background: repeating-linear-gradient(90deg, #0d47a1 0, #0d47a1 15px, #ffffff 15px, #ffffff 30px); }
-        .p2 { background: radial-gradient(circle, gold 2px, transparent 3px), #1a1a1a; background-size: 10px 10px; }
-        .p3 { background: repeating-linear-gradient(-45deg, #1b5e20 0, #1b5e20 5px, #ffffff 5px, #ffffff 10px); }
-        .p4 { background: linear-gradient(to right, #ff8a80, #ffffff, #80d8ff); }
-        .p5 { background: repeating-linear-gradient(0deg, #5d4037 0, #5d4037 10px, #8d6e63 10px, #8d6e63 20px); }
-        .p6 { background: repeating-linear-gradient(45deg, #7b1fa2 0, #7b1fa2 10px, #e1bee7 10px, #e1bee7 20px); }
-        .p7 { background: repeating-radial-gradient(circle, #D32F2F 0, #D32F2F 5px, #ffffff 5px, #ffffff 10px); }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #eee; }
 
+        /* 7. 头像配色 */
+        .p0 { background: linear-gradient(135deg, #ff5252, #b71c1c); } 
+        .p1 { background: linear-gradient(135deg, #69f0ae, #1b5e20); } 
+        .p2 { background: linear-gradient(135deg, #ffe082, #ff6f00); } 
+        .p3 { background: linear-gradient(135deg, #448aff, #1565c0); } 
+        .p4 { background: linear-gradient(135deg, #e040fb, #7b1fa2); } 
+        .p5 { background: linear-gradient(135deg, #18ffff, #006064); } 
+        .p6 { background: linear-gradient(135deg, #ffab40, #e65100); } 
+        .p7 { background: linear-gradient(135deg, #ff80ab, #c2185b); }
+
+        /* 氛围 */
+        .santa-sleigh-flying { position: absolute; top: 5%; right: -20%; font-size: 50px; animation: flyOver 35s linear infinite; opacity: 0.8; z-index: 2; }
+        @keyframes flyOver { 0% { right: -20%; transform: rotate(5deg) scale(0.8); } 100% { right: 120%; transform: rotate(-5deg) scale(0.8); } }
+        .reindeer-wrapper { position: absolute; bottom: 30px; left: -15%; z-index: 5; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5)); animation: runAcrossScreen 24s linear infinite; }
+        .reindeer-body { font-size: 60px; display: block; animation: gallopBounce 0.4s ease-in-out infinite alternate, faceDirection 24s steps(1) infinite; }
+        @keyframes runAcrossScreen { 0% { left: -15%; } 49.9% { left: 105%; } 50.1% { left: 105%; } 100% { left: -15%; } }
+        @keyframes faceDirection { 0% { transform: scaleX(-1); } 50% { transform: scaleX(1); } 100% { transform: scaleX(-1); } }
+        @keyframes gallopBounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
+        @keyframes starPulse { 0%{transform:scale(1);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
         @keyframes fadeIn { from{opacity:0; transform:translateY(5px)} to{opacity:1; transform:translateY(0)} }
+        .snowflake { position: absolute; top: -20px; color: #fff; animation: fall linear infinite; pointer-events: none; opacity: 0.7; }
+        @keyframes fall { to { transform: translateY(110vh); } }
     </style>
 </head>
 <body>
 
-    <div class="landing-page" id="landing-page">
-        <div class="landing-title-row">
-            <div class="landing-emoji">🎄</div>
-            <div class="landing-title">Festive Village Live</div>
-            <div class="landing-emoji">🎅</div>
-        </div>
-        <button class="enter-btn" onclick="enterVillage()">✨ 进入村庄 ✨</button>
+    <div class="landing-page" id="landing-page" style="position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(to bottom, #312A6C, #8567F5, #E68E6D); z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:0.8s;">
+        <h1 style="font-size:50px; text-shadow:0 5px 10px rgba(0,0,0,0.3); color:#fff;">🎄 Festive Village 🎅</h1>
+        <p style="color:#fff; font-size:18px; margin-bottom:40px; opacity:0.9;">模拟经营 · 互送礼物 · 点亮全图</p>
+        <button onclick="enterVillage()" style="background:#C6362C; color:#fff; font-size:24px; padding:15px 60px; border-radius:50px; border:2px solid #fff; cursor:pointer; box-shadow:0 0 20px rgba(255,255,255,0.5);">✨ 进入村庄 ✨</button>
     </div>
 
     <div class="santa-sleigh-flying">🎅🛷</div>
     <div class="reindeer-wrapper"><span class="reindeer-body">🦌</span></div>
     
-    <div class="my-profile-btn" onclick="openMyProfile()">
-        <div class="av-small p0" id="top-avatar"></div>
-        <span id="top-name">未登记</span>
+    <div class="top-bar">
+        <div class="app-title">Festive Village</div>
+        <div class="status-group">
+            <div class="coin-badge" onclick="alert('开盒子或卖礼物可获得金币！')">
+                <span>🪙</span> <span id="ui-coins">0</span>
+            </div>
+            <div class="shop-btn" onclick="openShop()"><span>🛒</span> 集市</div>
+            <div class="profile-badge" onclick="openMyProfile()">
+                <div class="av-small p0" id="top-avatar" style="width:28px; height:28px; border:none;"></div>
+                <span id="top-name" style="font-size:14px;">未登记</span>
+            </div>
+        </div>
     </div>
 
     <div class="app-container">
         <div class="panel">
             <div class="panel-title">📜 礼物动态榜</div>
             <div class="scroll-list" id="rank-list"></div>
-            <div style="font-size:12px; text-align:center; opacity:0.7; flex-shrink:0; padding-top:5px;">* 点击头像查看资料</div>
         </div>
 
         <div class="center-stage" id="stage" onmouseenter="stopAutoSlide()" onmouseleave="startAutoSlide()">
-            <div class="stage-header">
-                <div class="tree-title-display" id="tree-name-display">🎄 经典之森</div>
-                <div class="bgm-btn" id="bgm-btn" onclick="toggleBGM()">🔔</div>
+            <div class="tree-header">
+                <div class="tree-name" id="tree-name-display">🎄 快乐世俗</div>
+                <div style="font-size:20px; cursor:pointer;" onclick="toggleBGM()">🔊</div>
             </div>
-            <div class="nav-btn prev-btn" onclick="moveSlide(-1)">❮</div>
-            <div class="nav-btn next-btn" onclick="moveSlide(1)">❯</div>
+            <div class="nav-btn prev" onclick="moveSlide(-1)">❮</div>
+            <div class="nav-btn next" onclick="moveSlide(1)">❯</div>
             <div class="tree-wrapper" id="track"></div>
         </div>
 
@@ -319,325 +239,249 @@
             <div class="panel-title">💬 广场热聊</div>
             <div class="scroll-list" id="chat-list"></div>
             <div class="chat-input-row">
-                <input type="text" class="chat-inp" id="chat-inp" placeholder="送去祝福..." onkeypress="if(event.key==='Enter') sendChat()">
-                <button class="btn-main" style="padding:0 20px;" onclick="sendChat()">发送</button>
+                <input type="text" class="chat-inp" id="chat-inp" placeholder="@管家 聊聊..." onkeypress="if(event.key==='Enter') sendChat()">
+                <button class="btn-main" style="padding:8px 15px; margin-top:0; font-size:12px;" onclick="sendChat()">发送</button>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-reg">
+    <div class="modal-overlay active" id="modal-reg">
         <div class="modal-card">
-            <h2 style="color:var(--xmas-red)">🎅 欢迎回到圣诞村</h2>
-            <p>请选择你的格纹标志</p>
+            <h2 style="color:var(--xmas-red)">🎅 登记入住</h2>
+            <p>每位村民初始获得 <b>1</b> 次抽奖机会</p>
             <div class="avatar-grid">
-                <div class="av-select p0" onclick="selAv(0)"></div>
-                <div class="av-select p1" onclick="selAv(1)"></div>
-                <div class="av-select p2" onclick="selAv(2)"></div>
-                <div class="av-select p3" onclick="selAv(3)"></div>
-                <div class="av-select p4" onclick="selAv(4)"></div>
-                <div class="av-select p5" onclick="selAv(5)"></div>
-                <div class="av-select p6" onclick="selAv(6)"></div>
-                <div class="av-select p7" onclick="selAv(7)"></div>
+                <div class="av-select p0" onclick="selAv(0)"></div> <div class="av-select p1" onclick="selAv(1)"></div>
+                <div class="av-select p2" onclick="selAv(2)"></div> <div class="av-select p3" onclick="selAv(3)"></div>
+                <div class="av-select p4" onclick="selAv(4)"></div> <div class="av-select p5" onclick="selAv(5)"></div>
+                <div class="av-select p6" onclick="selAv(6)"></div> <div class="av-select p7" onclick="selAv(7)"></div>
             </div>
             <div class="gender-row">
                 <div class="gender-opt selected" id="g-boy" onclick="selGender('boy')">👦 男生</div>
                 <div class="gender-opt" id="g-girl" onclick="selGender('girl')">👧 女生</div>
             </div>
             <input id="inp-name" type="text" placeholder="昵称" style="width:80%; padding:10px; margin-bottom:10px;">
-            <input id="inp-bio" type="text" placeholder="宣言" style="width:80%; padding:10px; margin-bottom:20px;">
-            <button class="btn-main" onclick="register()">敲门进入</button>
+            <input id="inp-bio" type="text" placeholder="入村宣言" style="width:80%; padding:10px; margin-bottom:20px;">
+            <button class="btn-main" onclick="register()">开启旅程</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-shop">
+        <div class="modal-card">
+            <div class="btn-close" onclick="closeModal('modal-shop')">✕</div>
+            <h2 style="color:var(--xmas-red)">🛒 圣诞集市</h2>
+            <p>余额: <span style="color:var(--xmas-gold); font-weight:bold; font-size:20px;">🪙 <span id="shop-coins">0</span></span></p>
+            <hr style="border:0; border-top:1px dashed #ccc; margin:15px 0;">
+            <div class="shop-item">
+                <div style="text-align:left;">
+                    <div style="font-weight:bold; font-size:16px;">🎟️ 许愿券</div>
+                    <div style="font-size:12px; color:#666;">抽奖机会 +1</div>
+                </div>
+                <button class="btn-main" style="padding:5px 15px; margin:0; font-size:14px;" onclick="buyChance()">100 🪙</button>
+            </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-prize">
         <div class="modal-card">
-            <h2 style="color:var(--xmas-gold)">✨ 惊喜拆箱 ✨</h2>
-            <div id="prize-icon" style="font-size:70px; margin:20px 0;"></div>
-            <div id="prize-name" style="font-size:20px; font-weight:bold; margin-bottom:20px;"></div>
-            <div id="retry-hint" style="color:green; display:none; margin-bottom:10px;">获得【时光胶囊】！机会+1</div>
+            <h2 style="color:var(--xmas-gold)">✨ 哇！拆到了 ✨</h2>
+            <div id="prize-icon" style="font-size:70px; margin:10px 0;"></div>
+            <div id="prize-name" style="font-size:20px; font-weight:bold;"></div>
+            <div style="margin-top:10px; color:#d32f2f; font-weight:bold;">+ <span id="prize-add-coins">0</span> 金币 🪙</div>
+            <div id="retry-hint" style="color:green; display:none; margin-top:5px;">(获得【时光倒流】机会+1)</div>
+            <br>
             <button class="btn-main" onclick="closeModal('modal-prize')">收入背包</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-prof">
         <div class="modal-card">
-            <div style="position:absolute; top:10px; right:15px; cursor:pointer;" onclick="closeModal('modal-prof')">✕</div>
-            <div id="prof-av" class="av-small" style="width:70px; height:70px; margin:0 auto 10px auto; border-width:3px;"></div>
+            <div class="btn-close" onclick="closeModal('modal-prof')">✕</div>
+            <div id="prof-av" class="av-small" style="width:60px; height:60px; margin:0 auto 10px auto; border-width:3px;"></div>
             <h3 id="prof-name"></h3>
-            <p id="prof-gender" style="font-size:14px; margin-top:-10px;"></p>
-            <p id="prof-bio" style="font-style:italic; color:#666; background:#eee; padding:5px; border-radius:5px;"></p>
+            <p id="prof-gender" style="font-size:14px; margin-top:-10px; margin-bottom:5px;"></p>
+            <p id="prof-bio" style="font-style:italic; color:#666; background:#eee; padding:5px; border-radius:5px; font-size:13px;"></p>
             <hr style="border:0; border-top:1px dashed #ccc; margin:15px 0;">
             <h4 id="prof-bag-title">🎒 背包</h4>
-            <div id="prof-bag" style="display:grid; grid-template-columns:repeat(3,1fr); gap:5px; max-height:150px; overflow-y:auto;"></div>
+            <div id="prof-bag" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-height:150px; overflow-y:auto; padding:5px;"></div>
             <div id="my-controls" style="display:none; margin-top:15px; border-top:1px solid #ccc; padding-top:10px;">
-                <p style="font-size:12px; color:#aaa;">点击礼物可赠送</p>
+                <p style="font-size:12px; color:#666;">点击礼物操作：</p>
                 <p>剩余机会: <span id="my-chances" style="font-weight:bold; color:var(--xmas-red)">0</span></p>
             </div>
         </div>
     </div>
 
+    <div class="modal-overlay" id="modal-action">
+        <div class="modal-card">
+            <h3>🎁 礼物处理</h3>
+            <p>物品：<span id="action-item-name" style="font-weight:bold; color:var(--xmas-red)"></span></p>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                <button class="btn-main" style="background:#4CAF50; margin:0;" onclick="openGiveModal()">🎁 送人 (+1机会)</button>
+                <button class="btn-main" style="background:#FF9800; margin:0;" onclick="sellGift()">💰 卖出 (+<span id="sell-price">0</span>金币)</button>
+            </div>
+            <button class="btn-main" style="background:#999; margin-top:15px;" onclick="closeModal('modal-action')">取消</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="modal-give">
         <div class="modal-card">
-            <h3>🎁 赠送礼物</h3>
-            <p>要把 <span id="give-name" style="color:var(--xmas-red); font-weight:bold;"></span> 送给谁？</p>
-            <div id="give-list" style="text-align:left; max-height:150px; overflow-y:auto; margin:15px 0; background:#fff;"></div>
+            <h3>🎁 赠送给谁？</h3>
+            <div id="give-list" style="text-align:left; max-height:150px; overflow-y:auto; margin:10px 0; background:#fff; border-radius:8px;"></div>
             <button class="btn-main" style="background:#666;" onclick="closeModal('modal-give')">取消</button>
         </div>
     </div>
 
-    <audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mp3"></audio>
+    <audio id="sfx-win" src="https://www.soundjay.com/misc/sounds/magic-chime-01.mp3"></audio>
 
     <script>
+        // 1. 配置
+        const botNames = ["姜饼仔", "雪人啵啵", "麋鹿车神", "极光", "糖霜猫", "热红酒", "松果", "JingleBell"];
+        const botMsgs = ["今天运气真好！", "求互换礼物~", "谁有多余的金币？", "集齐图鉴太难了", "圣诞快乐！", "好想去滑雪啊"];
         const trees = [
-            { name: "🎄 快乐世俗", color: "#4CAF50", class: "t-classic", gifts: [
-                {i:"💰", n:"暴富"}, {i:"🧧", n:"年终奖翻倍"}, {i:"🍊", n:"大吉大利"}, {i:"🏠", n:"全款买房"}, {i:"🚗", n:"喜提新车"}, {i:"💳", n:"随便刷"}
-            ]},
-            { name: "❄️ 精神状态", color: "#29B6F6", class: "t-ice", gifts: [
-                {i:"😴", n:"睡眠充足"}, {i:"🧘", n:"松弛感"}, {i:"🏝️", n:"带薪休假"}, {i:"❤️", n:"被爱"}, {i:"✨", n:"好运爆棚"}, {i:"🕊️", n:"自由"}
-            ]},
-            { name: "🔮 魔法打工", color: "#9C27B0", class: "t-magic", gifts: [
-                {i:"⏳", n:"时光倒流 (再抽一次)", type:'retry'}, {i:"💇‍♀️", n:"发量惊人"}, {i:"🐛", n:"永无Bug"}, {i:"🕔", n:"准点下班"}, {i:"⚖️", n:"狂吃不胖"}, {i:"🐱", n:"猫狗双全"}
-            ]}
+            { name: "🎄 快乐世俗", class: "t-classic", gifts: [{i:"💰",n:"暴富"},{i:"🧧",n:"年终奖翻倍"},{i:"🏠",n:"全款买房"},{i:"🚗",n:"喜提新车"},{i:"💳",n:"随便刷"},{i:"📈",n:"基金回本"}] },
+            { name: "❄️ 精神状态", class: "t-ice", gifts: [{i:"😴",n:"深度睡眠"},{i:"🧘",n:"松弛感"},{i:"🏝️",n:"带薪休假"},{i:"❤️",n:"被爱"},{i:"✨",n:"水逆退散"},{i:"🕊️",n:"精神自由"}] },
+            { name: "🔮 魔法打工", class: "t-magic", gifts: [{i:"⏳",n:"时光倒流",type:'retry'},{i:"💇‍♀️",n:"发量惊人"},{i:"🐛",n:"永无Bug"},{i:"🕔",n:"准点下班"},{i:"⚖️",n:"狂吃不胖"},{i:"🐱",n:"猫狗双全"}] }
         ];
-        const boxPos = [
-            {t:170,l:220}, {t:250,l:180}, {t:270,l:280}, {t:340,l:140}, {t:350,l:320}, 
-            {t:370,l:230}, {t:440,l:100}, {t:450,l:360}, {t:480,l:200}
-        ];
+        const boxPos = [{t:170,l:220}, {t:250,l:180}, {t:270,l:280}, {t:340,l:140}, {t:350,l:320}, {t:370,l:230}, {t:440,l:100}, {t:450,l:360}, {t:480,l:200}];
 
-        let state = JSON.parse(localStorage.getItem('v18_state')) || {
-            opened: {0:[], 1:[], 2:[]},
-            history: [],
-            chats: [{n:"村长", t:"欢迎！每4秒自动切换，悬停即可暂停~", p:'chief'}],
-            users: {} 
-        };
-        let me = { name:"", bio:"", p:0, gender:"boy", chances:1, inv:[], giftedTo: [] };
-        let curSlide = 0;
-        let selP = 0;
-        let selG = "boy";
-        let giftToGiveIdx = -1;
-        let slideInterval = null;
+        // 2. 状态
+        let state = JSON.parse(localStorage.getItem('v25_state')) || { opened: {0:[],1:[],2:[]}, history: [], chats: [], users: {} };
+        let me = JSON.parse(localStorage.getItem('v25_me')) || { name:"", bio:"", p:0, gender:"boy", chances:1, coins: 50, inv:[], giftedTo: [] };
+        let curSlide=0, selP=0, selG="boy", actionIdx=-1, slideInterval=null;
 
         function init() {
             createSnow();
-            renderTrees(); 
-            renderChat();
-            renderRank();
-            updateSlides();
-            startAutoSlide();
-            // 初始化时不弹出注册框，等待进入
+            renderTrees(); renderChat(); renderRank(); updateSlides(); updateUI();
+            setInterval(simBotAction, 12000);
         }
 
-        // 新增：进入村庄逻辑
         function enterVillage() {
-            const landing = document.getElementById('landing-page');
-            landing.classList.add('hidden');
-            
-            // 尝试播放音乐（用户交互后浏览器允许播放）
-            const bgm = document.getElementById('bgm');
-            const btn = document.getElementById('bgm-btn');
-            bgm.play().then(() => {
-                btn.classList.add('playing');
-            }).catch(e => console.log("Autoplay prevented"));
-
-            // 显示注册弹窗
-            setTimeout(() => {
-                document.getElementById('modal-reg').classList.add('active');
-            }, 500);
+            document.querySelector('#landing-page').style.opacity = 0;
+            setTimeout(() => document.querySelector('#landing-page').remove(), 800);
+            playSound();
+            if(!me.name) setTimeout(() => document.getElementById('modal-reg').classList.add('active'), 500);
+            else addChat("系统", `${me.name} 回来了。`, 'bot');
+            startAutoSlide();
         }
 
-        function startAutoSlide() {
-            if(slideInterval) clearInterval(slideInterval);
-            slideInterval = setInterval(() => moveSlide(1), 4000);
-        }
-        function stopAutoSlide() { if(slideInterval) clearInterval(slideInterval); }
-        
-        function moveSlide(dir) {
-            curSlide += dir;
-            if(curSlide < 0) curSlide = 2;
-            if(curSlide > 2) curSlide = 0;
-            updateSlides();
-        }
-
-        function updateSlides() {
-            const t = document.getElementById('tree-name-display');
-            t.innerText = trees[curSlide].name;
-            t.style.color = trees[curSlide].color;
-
-            const slides = document.querySelectorAll('.tree-slide');
-            slides.forEach((s, i) => {
-                if(i === curSlide) s.classList.add('active');
-                else s.classList.remove('active');
-            });
-        }
-
-        function renderTrees() {
-            const track = document.getElementById('track');
-            track.innerHTML = '';
-            
-            trees.forEach((tree, tIdx) => {
-                const slide = document.createElement('div');
-                slide.className = 'tree-slide';
-                if(tIdx === 0) slide.classList.add('active');
-
-                let layersHTML = '';
-                for(let i=1; i<=10; i++) layersHTML += `<div class="tree-layer l${i}"></div>`;
-                
-                let boxesHTML = `<div class="box-wrapper">`;
-                for(let i=0; i<9; i++) {
-                    const isOpen = state.opened[tIdx].includes(i);
-                    const openClass = isOpen ? 'opened' : '';
-                    const disableClass = (me.chances <= 0 && !isOpen) ? 'disabled' : '';
-                    const style = `top:${boxPos[i].t}px; left:${boxPos[i].l}px;`;
-                    
-                    boxesHTML += `
-                        <div class="box ${openClass} ${disableClass}" style="${style}" onclick="openBox(${tIdx}, ${i})">
-                            <div class="bow"></div>
-                        </div>
-                    `;
-                }
-                boxesHTML += `</div>`;
-
-                slide.innerHTML = `
-                    <div class="tree-css ${tree.class}">
-                        <div class="star-top">🌟</div>
-                        ${layersHTML}
-                        <div class="tree-stump"></div>
-                        ${boxesHTML}
-                    </div>
-                `;
-                track.appendChild(slide);
-            });
-        }
-
+        // 3. 核心交互
         function openBox(tIdx, bIdx) {
             if(!me.name) return;
             if(state.opened[tIdx].includes(bIdx)) return;
-            
-            if(me.chances <= 0) {
-                alert("次数用光啦！");
-                return;
-            }
+            if(me.chances <= 0) { alert("机会用光啦！卖礼物或送人可换机会！"); return; }
 
             state.opened[tIdx].push(bIdx);
             me.chances--;
-            
+            const coinGain = Math.floor(Math.random()*40)+10;
+            me.coins += coinGain;
             const gift = trees[tIdx].gifts[bIdx % trees[tIdx].gifts.length];
-            if(gift.type === 'retry') me.chances++;
+            if(gift.type==='retry') me.chances++;
 
-            const item = { i: gift.i, n: gift.n, from: me.name, to: me.name, type: 'draw' };
-            me.inv.push(item);
-            state.history.unshift({ ...item, p: me.p, time: Date.now() });
+            me.inv.push({i:gift.i, n:gift.n, from:me.name, to:me.name, type:'draw'});
+            state.history.unshift({i:gift.i, n:gift.n, from:me.name, to:me.name, type:'draw', p:me.p});
             
-            addChat("村长", `${me.name} 在 [${trees[tIdx].name}] 拆到了 ${gift.i} ${gift.n}！`, 'chief');
-
-            saveState();
-            renderTrees(); 
-            updateSlides(); 
-            renderRank();
-            updateMyInfo();
+            playSound();
+            saveAll(); renderTrees(); updateSlides(); renderRank(); updateUI();
 
             document.getElementById('prize-icon').innerText = gift.i;
             document.getElementById('prize-name').innerText = gift.n;
-            document.getElementById('retry-hint').style.display = gift.type==='retry' ? 'block' : 'none';
+            document.getElementById('prize-add-coins').innerText = coinGain;
+            document.getElementById('retry-hint').style.display = gift.type==='retry'?'block':'none';
             document.getElementById('modal-prize').classList.add('active');
         }
 
-        function selAv(i) {
-            selP = i;
-            document.querySelectorAll('.av-select').forEach((el, idx) => {
-                if(idx === i) el.classList.add('selected');
-                else el.classList.remove('selected');
-            });
-        }
-        function selGender(g) {
-            selG = g;
-            document.getElementById('g-boy').className = g==='boy'?'gender-opt selected':'gender-opt';
-            document.getElementById('g-girl').className = g==='girl'?'gender-opt selected':'gender-opt';
-        }
-        
-        function register() {
-            const n = document.getElementById('inp-name').value.trim();
-            if(!n) return;
-            me.name = n;
-            me.bio = document.getElementById('inp-bio').value.trim() || "这家伙很懒";
-            me.p = selP;
-            me.gender = selG;
-            me.giftedTo = [];
-            
-            state.users[me.name] = { bio: me.bio, p: me.p, gender: me.gender };
-            saveState();
-            document.getElementById('modal-reg').classList.remove('active');
-            updateMyInfo();
-            renderTrees(); 
-            updateSlides();
-            addChat("村长", `欢迎新村民 ${me.name}！`, 'chief');
-        }
-
-        function updateMyInfo() {
-            document.getElementById('top-name').innerText = me.name;
-            document.getElementById('top-avatar').className = `av-small p${me.p}`;
-        }
-
-        function renderChat() {
-            const list = document.getElementById('chat-list');
-            list.innerHTML = '';
-            state.chats.forEach(c => {
-                const row = document.createElement('div');
-                const isChief = c.p === 'chief';
-                row.className = isChief ? 'chat-row chief' : 'chat-row';
-                
-                const av = document.createElement('div');
-                if(isChief) {
-                    av.className = 'chat-av chief-av';
-                    av.innerText = '🎅';
-                } else {
-                    av.className = `chat-av p${c.p}`;
-                    av.onclick = () => showProfile(c.n);
-                }
-                
-                const bubble = document.createElement('div');
-                bubble.className = 'chat-bubble';
-                const nameHtml = isChief ? `<div class="chat-name">村长</div>` : `<div class="chat-name" onclick="showProfile('${c.n}')">${c.n}</div>`;
-                bubble.innerHTML = `${nameHtml}${c.t}`;
-                
-                row.appendChild(av);
-                row.appendChild(bubble);
-                list.appendChild(row);
-            });
-            list.scrollTop = list.scrollHeight;
-        }
-
+        // 4. 智能管家
         function sendChat() {
             const inp = document.getElementById('chat-inp');
             const txt = inp.value.trim();
             if(!txt || !me.name) return;
             addChat(me.name, txt, me.p);
             inp.value = '';
+
+            // 智能回复逻辑升级
+            if(txt.includes("@管家") || txt.includes("@Rudolph") || txt.includes("@驯鹿")) {
+                let reply = "我在听！有什么可以帮您？";
+                // 关键词匹配
+                if(txt.includes("没钱") || txt.includes("穷")) reply = "卖掉不喜欢的礼物，或者送给朋友，都可以换资源哦！";
+                else if(txt.includes("怎么玩") || txt.includes("玩法")) reply = "点击中间的树抽奖，左上角去集市买机会！";
+                else if(txt.includes("你好") || txt.includes("嗨")) reply = `你好呀 ${me.name}！今天想许什么愿？`;
+                else if(txt.includes("帅") || txt.includes("酷")) reply = "谢谢夸奖，我的红鼻子可是全村最亮的！";
+                else if(txt.includes("谢谢")) reply = "不客气，祝您圣诞快乐！";
+                else {
+                    // 随机语料库
+                    const randomTalks = [
+                        "多喝热水，冬天别着凉了。",
+                        "听说集齐所有图鉴会有好事发生哦。",
+                        "您可以去【魔法打工】树碰碰运气。",
+                        "我是全村最聪明的驯鹿，不接受反驳。",
+                        "今天雪下得真大呀~"
+                    ];
+                    reply = randomTalks[Math.floor(Math.random() * randomTalks.length)];
+                }
+                setTimeout(() => addChat("驯鹿管家", reply, 'bot'), 1500);
+            }
         }
 
-        function addChat(n, t, p) {
-            state.chats.push({n, t, p});
-            if(state.chats.length > 50) state.chats.shift();
-            saveState();
-            renderChat();
+        // 点击 @ 功能
+        window.mentionUser = function(name) {
+            const inp = document.getElementById('chat-inp');
+            inp.value = `@${name} `;
+            inp.focus();
         }
 
+        // 5. 机器人模拟 (升级版)
+        function simBotAction() {
+            const dice = Math.random();
+            const bot = botNames[Math.floor(Math.random()*botNames.length)];
+            const p = Math.floor(Math.random()*8);
+            
+            if(dice < 0.3) {
+                // 说话
+                addChat(bot, botMsgs[Math.floor(Math.random()*botMsgs.length)], p);
+            } else if(dice < 0.6) {
+                // 开盒
+                const t = Math.floor(Math.random()*3); 
+                const g = trees[t].gifts[Math.floor(Math.random()*6)];
+                state.history.unshift({i:g.i, n:g.n, from:bot, to:bot, type:'draw', p:p});
+                if(state.history.length>20) state.history.pop();
+                state.users[bot] = {bio:"NPC", p:p, gender:"boy"};
+                saveState(); renderRank();
+            } else if(dice > 0.9 && me.name) {
+                // 随机送礼给你
+                const tIdx = Math.floor(Math.random()*3);
+                const gift = trees[tIdx].gifts[Math.floor(Math.random()*6)]; // 随机礼物
+                
+                me.inv.push({i:gift.i, n:gift.n, from:bot, to:me.name, type:'receive'});
+                state.history.unshift({i:gift.i, n:gift.n, from:bot, to:me.name, type:'give', p:p});
+                
+                saveAll(); renderRank(); updateUI();
+                // 顶部通知
+                const div = document.createElement('div');
+                div.style.position='fixed'; div.style.top='80px'; div.style.left='50%'; div.style.transform='translateX(-50%)';
+                div.style.background='rgba(0,0,0,0.8)'; div.style.padding='10px 20px'; div.style.borderRadius='30px';
+                div.style.color='#fff'; div.style.zIndex='3000'; div.innerHTML = `🎁 <b>${bot}</b> 送了你 [${gift.n}]!`;
+                document.body.appendChild(div);
+                setTimeout(()=>div.remove(), 3000);
+            }
+        }
+
+        // 6. UI与辅助
         function renderRank() {
-            const list = document.getElementById('rank-list');
-            list.innerHTML = '';
-            state.history.forEach(h => {
-                const el = document.createElement('div');
-                el.className = 'rank-item';
-                let txt = h.type === 'draw' ? `<span>${h.from}</span> 拆到了 ${h.i} ${h.n}` : `<span>${h.from}</span> ➔ ${h.to} : ${h.i}`;
-                el.innerHTML = `<div class="av-small p${h.p}"></div><div style="font-size:13px">${txt}</div>`;
-                el.onclick = () => showProfile(h.from); 
+            const list = document.getElementById('rank-list'); list.innerHTML = '';
+            state.history.slice(0,50).forEach(h => {
+                const el = document.createElement('div'); el.className = 'rank-item';
+                const av = `<div class="rank-av p${h.p}"></div>`;
+                let txt = h.type==='draw' 
+                    ? `<span style="color:#FFD700">${h.from}</span> 拆到了 ${h.i} ${h.n}` 
+                    : `<span style="color:#FFD700">${h.from}</span> <span class="rank-action">送给</span> ${h.to} : ${h.i}`;
+                el.innerHTML = `${av}<div class="rank-text">${txt}</div>`;
+                el.onclick = () => showProfile(h.from);
                 list.appendChild(el);
             });
         }
 
         function showProfile(name) {
             const isMe = (name === me.name);
-            const user = isMe ? me : (state.users[name] || {bio:"未知村民", p:0, gender:"boy"});
+            const user = isMe ? me : (state.users[name] || {bio:"神秘村民", p:0, gender:"boy"});
             
             document.getElementById('prof-name').innerText = name;
             document.getElementById('prof-gender').innerText = user.gender === 'boy' ? '👦 男生' : '👧 女生';
@@ -645,138 +489,123 @@
             document.getElementById('prof-av').className = `av-small p${user.p}`;
             
             const bagTitle = document.getElementById('prof-bag-title');
-            if(isMe) bagTitle.innerText = "🎒 我的背包";
-            else bagTitle.innerText = user.gender === 'boy' ? "🎒 他的背包" : "🎒 她的背包";
+            if(isMe) bagTitle.innerText = "🎒 我的背包 (点击操作)";
+            else bagTitle.innerText = user.gender==='boy' ? "🎒 他的背包" : "🎒 她的背包";
 
-            const bag = document.getElementById('prof-bag');
-            bag.innerHTML = '';
-            const items = isMe ? me.inv : state.history.filter(h => h.to === name).map(h => ({i:h.i, n:h.n}));
+            const bag = document.getElementById('prof-bag'); bag.innerHTML = '';
+            let items = [];
+            if(isMe) items = me.inv;
+            else items = state.history.filter(h => h.to===name && h.type!=='give').map(h=>({i:h.i, n:h.n}));
             
-            if(items.length === 0) bag.innerHTML = '<div style="color:#aaa; font-size:12px;">背包空空</div>';
-            else {
-                items.forEach((item, idx) => {
-                    const div = document.createElement('div');
-                    div.style.background = 'rgba(0,0,0,0.1)'; div.style.padding = '5px'; div.style.fontSize = '12px';
-                    div.innerHTML = `${item.i}<br>${item.n}`;
-                    if(isMe) {
-                        div.style.cursor = 'pointer'; div.title = '赠送';
-                        div.onclick = () => openGiveModal(idx);
-                    }
-                    bag.appendChild(div);
-                });
-            }
+            if(items.length === 0) bag.innerHTML = '<div style="color:#aaa; font-size:12px;">空空如也</div>';
+            items.forEach((item, idx) => {
+                const d = document.createElement('div');
+                d.style.background='rgba(255,255,255,0.1)'; d.style.padding='5px'; d.style.borderRadius='5px'; d.style.fontSize='12px'; d.innerHTML=`${item.i}<br>${item.n}`;
+                if(isMe) { d.style.cursor='pointer'; d.onclick = () => openActionModal(idx); }
+                bag.appendChild(d);
+            });
+            
             document.getElementById('my-controls').style.display = isMe ? 'block' : 'none';
             if(isMe) document.getElementById('my-chances').innerText = me.chances;
             document.getElementById('modal-prof').classList.add('active');
         }
         function openMyProfile() { showProfile(me.name); }
 
-        function openGiveModal(idx) {
-            giftToGiveIdx = idx;
-            document.getElementById('give-name').innerText = me.inv[idx].n;
-            const list = document.getElementById('give-list');
-            list.innerHTML = '';
-            let users = new Set();
-            state.chats.forEach(c => users.add(c.n));
-            state.history.forEach(h => users.add(h.from));
-            users.delete(me.name); users.delete("村长");
-            if(users.size === 0) list.innerHTML = '<div style="padding:10px;color:#aaa">暂无活跃村民...</div>';
+        function openActionModal(idx) {
+            actionIdx = idx;
+            document.getElementById('action-item-name').innerText = me.inv[idx].n;
+            const price = Math.floor(Math.random()*30)+30; 
+            document.getElementById('sell-price').innerText = price;
+            document.getElementById('sell-price').dataset.price = price;
+            closeModal('modal-prof'); document.getElementById('modal-action').classList.add('active');
+        }
+        function sellGift() {
+            const price = parseInt(document.getElementById('sell-price').dataset.price);
+            me.inv.splice(actionIdx, 1); me.coins += price;
+            saveAll(); updateUI(); closeModal('modal-action');
+            alert(`出售成功！获得 ${price} 金币`);
+        }
+        function openGiveModal() {
+            closeModal('modal-action');
+            const list = document.getElementById('give-list'); list.innerHTML = '';
+            const users = new Set([...botNames]); 
+            state.chats.forEach(c => {if(c.p!=='bot') users.add(c.n)}); users.delete(me.name);
+            
             users.forEach(u => {
-                const row = document.createElement('div');
-                row.style.padding = '10px'; row.style.cursor = 'pointer'; row.innerText = `👤 ${u}`;
-                row.onclick = () => giveGift(u);
-                list.appendChild(row);
+                const d = document.createElement('div'); d.style.padding='10px'; d.style.borderBottom='1px solid #eee'; d.style.cursor='pointer'; d.innerText=`👤 ${u}`;
+                d.onclick = () => giveGift(u); list.appendChild(d);
             });
-            closeModal('modal-prof');
             document.getElementById('modal-give').classList.add('active');
         }
-
         function giveGift(toUser) {
-            if(me.giftedTo.includes(toUser)) {
-                alert(`你已经送过礼物给 ${toUser} 啦！每人只能送一次哦~`);
-                return;
-            }
-
-            const gift = me.inv.splice(giftToGiveIdx, 1)[0];
-            const record = { i: gift.i, n: gift.n, from: me.name, to: toUser, type: 'give', p: me.p, time: Date.now() };
-            state.history.unshift(record);
-            
-            me.giftedTo.push(toUser);
-            me.chances++; 
-
+            if(me.giftedTo.includes(toUser)) { alert("每人只能送一次哦"); return; }
+            const gift = me.inv.splice(actionIdx, 1)[0];
+            state.history.unshift({i:gift.i, n:gift.n, from:me.name, to:toUser, type:'give', p:me.p});
+            me.giftedTo.push(toUser); me.chances++;
             addChat("村长", `🎁 ${me.name} 把 [${gift.n}] 送给了 ${toUser}！`, 'chief');
-            saveState(); renderRank(); closeModal('modal-give');
-            
-            renderTrees();
-            updateSlides(); 
-            updateMyInfo();
-
-            alert(`成功送给 ${toUser}！\n你获得了一次额外的抽奖机会！快去看看树上的礼物吧！`);
+            saveAll(); renderRank(); closeModal('modal-give'); renderTrees(); updateUI();
+            playSound(); alert("赠送成功！机会+1");
         }
 
-        function saveState() { localStorage.setItem('v18_state', JSON.stringify(state)); }
+        function openShop() { document.getElementById('shop-coins').innerText = me.coins; document.getElementById('modal-shop').classList.add('active'); }
+        function buyChance() {
+            if(me.coins >= 100) {
+                me.coins -= 100; me.chances++;
+                saveAll(); updateUI(); renderTrees(); document.getElementById('shop-coins').innerText = me.coins;
+                playSound(); alert("购买成功！");
+            } else alert("金币不足！");
+        }
+
+        function saveAll() { localStorage.setItem('v25_state', JSON.stringify(state)); localStorage.setItem('v25_me', JSON.stringify(me)); }
+        function saveState() { localStorage.setItem('v25_state', JSON.stringify(state)); }
+        function addChat(n, t, p) { state.chats.push({n,t,p}); if(state.chats.length>50) state.chats.shift(); saveAll(); renderChat(); }
+        function renderChat() {
+            const list = document.getElementById('chat-list'); list.innerHTML = '';
+            state.chats.slice(-50).forEach(c => {
+                const row = document.createElement('div'); row.className = c.p==='bot'||c.p==='chief'?'chat-row bot':'chat-row';
+                const avHtml = (c.p==='bot'||c.p==='chief') ? `<div class="chat-av bot-av" onclick="mentionUser('${c.n}')">${c.p==='chief'?'🎅':'🦌'}</div>` : `<div class="chat-av p${c.p}" onclick="mentionUser('${c.n}')"></div>`;
+                row.innerHTML = `${avHtml}<div class="chat-content"><div class="chat-name" onclick="mentionUser('${c.n}')">${c.n}</div><div class="chat-bubble">${c.t}</div></div>`;
+                list.appendChild(row);
+            });
+            list.scrollTop = list.scrollHeight;
+        }
+        function renderTrees() {
+            const track = document.getElementById('track'); track.innerHTML = '';
+            trees.forEach((tree, tIdx) => {
+                const slide = document.createElement('div'); slide.className = 'tree-slide'; if(tIdx===curSlide) slide.classList.add('active');
+                let layers=''; for(let i=1; i<=10; i++) layers+=`<div class="tree-layer l${i}"></div>`;
+                let boxes='<div class="box-wrapper">';
+                for(let i=0; i<9; i++) {
+                    const isOpen = state.opened[tIdx].includes(i);
+                    const cls = isOpen ? 'opened' : (me.chances<=0?'disabled':'');
+                    boxes += `<div class="box ${cls}" style="top:${boxPos[i].t}px;left:${boxPos[i].l}px" onclick="openBox(${tIdx},${i})"><div class="bow"></div></div>`;
+                }
+                slide.innerHTML = `<div class="tree-css ${tree.class}"><div class="star-top">🌟</div>${layers}<div class="tree-stump"></div>${boxes}</div></div>`;
+                track.appendChild(slide);
+            });
+        }
+        function register() {
+            const n = document.getElementById('inp-name').value.trim(); if(!n) return;
+            me.name=n; me.bio=document.getElementById('inp-bio').value||"暂无"; me.p=selP; me.gender=selG;
+            state.users[me.name]={bio:me.bio, p:me.p, gender:me.gender};
+            saveAll(); document.getElementById('modal-reg').classList.remove('active'); updateUI();
+            addChat("驯鹿管家", `欢迎新村民 ${me.name}！我是这里的管家，有问题随时 @管家 问我。`, 'bot');
+        }
+        function updateUI() {
+            if(me.name) { document.getElementById('top-name').innerText=me.name; document.getElementById('top-avatar').className=`av-small p${me.p}`; document.getElementById('ui-coins').innerText=me.coins; }
+        }
+        function playSound() { document.getElementById('sfx-win').play().catch(()=>{}); }
+        function toggleBGM() { playSound(); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        
-        function toggleBGM() {
-            const bgm = document.getElementById('bgm');
-            const btn = document.getElementById('bgm-btn');
-            if(bgm.paused) {
-                bgm.play();
-                btn.classList.add('playing');
-            } else {
-                bgm.pause();
-                btn.classList.remove('playing');
-            }
-        }
-
-        function createSnow() {
-            for(let i=0; i<80; i++) {
-                const s = document.createElement('div');
-                s.className = 'snowflake'; s.innerText = Math.random()>0.5 ? '❄' : '·';
-                s.style.left = Math.random()*100+'vw'; s.style.fontSize = (Math.random()*15+5)+'px';
-                s.style.animationDuration = (Math.random()*5+5)+'s'; s.style.animationDelay = Math.random()*15+'s';
-                document.body.appendChild(s);
-            }
-        }
+        function moveSlide(d) { curSlide+=d; if(curSlide<0)curSlide=2; if(curSlide>2)curSlide=0; updateSlides(); }
+        function updateSlides() { document.getElementById('tree-name-display').innerText = trees[curSlide].name; document.getElementById('tree-name-display').style.color=trees[curSlide].color; document.querySelectorAll('.tree-slide').forEach((s,i)=>i===curSlide?s.classList.add('active'):s.classList.remove('active')); }
+        function startAutoSlide() { if(slideInterval) clearInterval(slideInterval); slideInterval = setInterval(()=>moveSlide(1), 4000); }
+        function stopAutoSlide() { clearInterval(slideInterval); }
+        function selAv(i) { selP = i; document.querySelectorAll('.av-select').forEach((e,x) => e.style.border = x===i ? '3px solid gold' : '3px solid transparent'); }
+        function selGender(g) { selG = g; document.getElementById('g-boy').className = g==='boy'?'gender-opt selected':'gender-opt'; document.getElementById('g-girl').className = g==='girl'?'gender-opt selected':'gender-opt'; }
+        function createSnow() { for(let i=0; i<80; i++) { const s=document.createElement('div'); s.className='snowflake'; s.innerText=Math.random()>0.5?'❄':'·'; s.style.left=Math.random()*100+'vw'; s.style.fontSize=(Math.random()*15+5)+'px'; s.style.animationDuration=(Math.random()*5+5)+'s'; s.style.animationDelay=Math.random()*15+'s'; document.body.appendChild(s); }}
 
         init();
     </script>
 </body>
 </html>
-
-<!-- Real-time chat sync via Yjs -->
-    <script src="https://cdn.jsdelivr.net/npm/yjs@13.5.25/dist/yjs.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/y-websocket@1.4.5/dist/y-websocket.js"></script>
-    <script>
-    (function(){
-        const ydoc = new Y.Doc();
-        // connect to public yjs websocket server; room name for this app
-        const provider = new Y.WebsocketProvider('wss://demos.yjs.dev', 'festive-village-live-chat', ydoc);
-        const ychats = ydoc.getArray('chats');
-        // initialize Y array with existing chats if empty
-        if (ychats.length === 0) {
-            ychats.push([state.chats]);
-        } else {
-            state.chats = ychats.toArray()[0];
-            renderChat();
-        }
-        // observe remote updates
-        ychats.observe(event => {
-            const latest = ychats.toArray()[0];
-            // update local state if different
-            if (JSON.stringify(latest) !== JSON.stringify(state.chats)) {
-                state.chats = latest;
-                renderChat();
-            }
-        });
-        // override addChat to sync to Yjs
-        const oldAddChat = addChat;
-        addChat = function(n, t, p) {
-            oldAddChat(n, t, p);
-            // push updated chats to Yjs
-            ychats.delete(0, ychats.length);
-            ychats.push([state.chats]);
-        };
-    })();
-    </script>
-</script>
