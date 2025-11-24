@@ -743,3 +743,40 @@
     </script>
 </body>
 </html>
+
+<!-- Real-time chat sync via Yjs -->
+    <script src="https://cdn.jsdelivr.net/npm/yjs@13.5.25/dist/yjs.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/y-websocket@1.4.5/dist/y-websocket.js"></script>
+    <script>
+    (function(){
+        const ydoc = new Y.Doc();
+        // connect to public yjs websocket server; room name for this app
+        const provider = new Y.WebsocketProvider('wss://demos.yjs.dev', 'festive-village-live-chat', ydoc);
+        const ychats = ydoc.getArray('chats');
+        // initialize Y array with existing chats if empty
+        if (ychats.length === 0) {
+            ychats.push([state.chats]);
+        } else {
+            state.chats = ychats.toArray()[0];
+            renderChat();
+        }
+        // observe remote updates
+        ychats.observe(event => {
+            const latest = ychats.toArray()[0];
+            // update local state if different
+            if (JSON.stringify(latest) !== JSON.stringify(state.chats)) {
+                state.chats = latest;
+                renderChat();
+            }
+        });
+        // override addChat to sync to Yjs
+        const oldAddChat = addChat;
+        addChat = function(n, t, p) {
+            oldAddChat(n, t, p);
+            // push updated chats to Yjs
+            ychats.delete(0, ychats.length);
+            ychats.push([state.chats]);
+        };
+    })();
+    </script>
+</script>
